@@ -1,0 +1,29 @@
+﻿<Window x:Class="App_Automatize_Backery.View.Windows.SupplyRequest.CreateRawMaterialToRequestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:App_Automatize_Backery.View.Windows.SupplyRequest" xmlns:supplyrequest="clr-namespace:App_Automatize_Backery.ViewModels.SupportViewModel.SupplyRequest" d:DataContext="{d:DesignInstance Type=supplyrequest:CreateRMToRequestViewModel}"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Title="CreateRawMaterialToRequestWindow" Height="350" Width="400">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+
+            <TextBlock Text="Выберите сырье" FontSize="16" Margin="10"/>
+            <ComboBox x:Name="RawMaterialComboBox" Margin="10" 
+                      ItemsSource="{Binding RawMaterials}" 
+                      DisplayMemberPath="RawMaterialName" 
+                      SelectedItem="{Binding SelectedRawMaterial}"/>
+
+            <TextBlock Text="Количество" FontSize="16" Margin="10"/>
+            <TextBox x:Name="CountTextBox" Margin="10" Text="{Binding CountRawMaterial}"/>
+
+            <TextBlock Text="Стоимость" FontSize="16" Margin="10"/>
+            <TextBox x:Name="CostTextBox" Margin="10" Text="{Binding SupplyCoastToMaterial}"/>
+
+            <Button Content="Сохранить" Command="{Binding SaveRawMaterialCommand}" Width="100" Margin="10" HorizontalAlignment="Right"/>
+        </StackPanel>
+    </Grid>
+</Window>

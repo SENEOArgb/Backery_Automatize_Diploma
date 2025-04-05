@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="App_Automatize_Backery.View.UserControls_Pages_.ProductsUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_" xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:ProductsViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Width="95" Height="40" VerticalAlignment="Top" >
+            <Button Content="Создать" Command="{Binding CreateProductCommand}" Margin="5"/>
+        </StackPanel>
+
+        <DataGrid x:Name="products" Grid.Row="1" ItemsSource="{Binding Products}" AutoGenerateColumns="False" 
+                  HeadersVisibility="Column" CanUserAddRows="False" 
+                  CanUserDeleteRows="False" CanUserResizeColumns="True"
+                  Margin="0 70 0 0" Padding="10"
+                  Style="{StaticResource MaterialDesignDataGrid}"
+                  SelectedItem="{Binding SelectedProduct}">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding ProductName}" Width="200"/>
+                <DataGridTextColumn Header="Тип изделия" Binding="{Binding TypeProduct.TypeProductName}" Width="150"/>
+                <DataGridTextColumn Header="Цена" Binding="{Binding ProductCoast, StringFormat={}{0} руб.}" Width="100"/>
+
+                <!-- Кнопка Редактировать -->
+                <DataGridTemplateColumn Header="Редактировать">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="✎" Command="{Binding DataContext.EditProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Кнопка Удалить -->
+                <DataGridTemplateColumn Header="Удалить">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="🗑" Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

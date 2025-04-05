@@ -1,0 +1,23 @@
+﻿<Application x:Class="App_Automatize_Backery.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:App_Automatize_Backery" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             StartupUri="View/Windows/LoginWindow.xaml"
+    xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+    xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+    xmlns:helpers="clr-namespace:App_Automatize_Backery.Helper.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:CustomColorTheme BaseTheme="Light" PrimaryColor="Aqua" SecondaryColor="DarkGreen" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <helpers:StatusToEnabledConverter x:Key="StatusToEnabledConverter"/>
+            <helpers:StatusToColorConverter x:Key="StatusToColorConverter"/>
+            <helpers:TypeSaleToVisibilityConverter x:Key="TypeSaleToVisibilityConverter"/>
+            <helpers:SaleStatusToIsEnabledConverter x:Key="SaleStatusToIsEnabledConverter"/>
+            <helpers:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

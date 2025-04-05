@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="App_Automatize_Backery.View.UserControls_Pages_.WorkerManufactury.SalesUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_.WorkerManufactury"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:salesvm="clr-namespace:App_Automatize_Backery.ViewModels.SalesVM" d:DataContext="{d:DesignInstance Type=salesvm:SalesViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Margin="10">
+            <!-- Заголовок -->
+            <TextBlock Text="Продажи" FontSize="24" FontWeight="Bold" 
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" 
+                       Margin="0,0,0,10"/>
+
+            <!-- Кнопка создания -->
+            <Button Content="Создать продажу" Command="{Binding CreateSaleCommand}"
+                    Style="{StaticResource MaterialDesignRaisedButton}" Height="40" Margin="0,0,0,10"/>
+
+            <!-- Таблица с продажами -->
+            <DataGrid ItemsSource="{Binding Sales}" SelectedItem="{Binding SelectedSale}" 
+                      AutoGenerateColumns="False" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      RowHeight="40" GridLinesVisibility="None" MaxHeight="200" Height="200"
+                      SelectionMode="Single" AlternatingRowBackground="{DynamicResource MaterialDesignPaper}">
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Тип продажи" Binding="{Binding TypeSale}" Width="130"/>
+                    <DataGridTextColumn Header="Дата продажи" Binding="{Binding DateTimeSale, StringFormat='dd.MM.yyyy HH:mm'}" Width="140"/>
+                    <DataGridTextColumn Header="Статус" Binding="{Binding SaleStatus}" Width="100"/>
+                    <DataGridTextColumn Header="Стоимость" Binding="{Binding CoastSale, StringFormat={}{0} руб.}" Width="100"/>
+                    <DataGridTemplateColumn Header="Действия" Width="250">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- Кнопка "Просмотреть" (переключает видимость) -->
+                                    <Button Content="Просмотреть" Command="{Binding DataContext.ViewSaleDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                        CommandParameter="{Binding}" Style="{StaticResource MaterialDesignFlatButton}" Margin="5,0"/>
+
+                                    <!-- Кнопка "Удалить" -->
+                                    <Button Content="Удалить"
+                                            Command="{Binding DataContext.DeleteSaleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource MaterialDesignFlatButton}" 
+                                            Margin="5,0"
+                                            Foreground="Red"
+                                            Visibility="{Binding TypeSale, Converter={StaticResource TypeSaleToVisibilityConverter}}"
+                                            IsEnabled="{Binding SaleStatus, Converter={StaticResource SaleStatusToIsEnabledConverter}}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Контент с продуктами продажи -->
+            <Border Background="{DynamicResource MaterialDesignPaper}" CornerRadius="5" Padding="10" Margin="0,10,0,0">
+                <ContentControl Content="{Binding SelectedSaleDetails}" />
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

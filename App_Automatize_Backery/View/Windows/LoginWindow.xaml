@@ -1,0 +1,21 @@
+﻿<Window x:Class="App_Automatize_Backery.View.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:App_Automatize_Backery.View" xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels"
+        mc:Ignorable="d"
+        Title="LoginWindow" Height="450" Width="800">
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
+            <!-- Привязка логина -->
+            <TextBox Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!-- Привязка пароля через PasswordChanged -->
+            <PasswordBox Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" />
+
+            <!-- Кнопка входа -->
+            <Button Content="Войти" Command="{Binding LoginCommand}" />
+        </StackPanel>
+    </Grid>
+</Window>

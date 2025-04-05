@@ -1,0 +1,35 @@
+﻿<Window x:Class="App_Automatize_Backery.View.UserControls_Pages_.TechnologPages.ProductCreateEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_.TechnologPages" xmlns:productsupportvm="clr-namespace:App_Automatize_Backery.ViewModels.ProductSupportVM" d:DataContext="{d:DesignInstance Type=productsupportvm:ProductCreateEditViewModel}"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Title="ProductCreateEditWindow" Height="350" Width="400">
+
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
+
+            <TextBlock Text="Наименование" FontSize="16" Margin="10"/>
+            <TextBox Margin="10" Text="{Binding Product.ProductName, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Text="Тип изделия" FontSize="16" Margin="10"/>
+            <ComboBox Margin="10"
+                      ItemsSource="{Binding TypeProducts}"
+                      SelectedValue="{Binding Product.TypeProductId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValuePath="TypeProductId"
+                      DisplayMemberPath="TypeProductName"/>
+
+            <TextBlock Text="Цена" FontSize="16" Margin="10"/>
+            <TextBox Margin="10" Text="{Binding Product.ProductCoast, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Сохранить" Command="{Binding SaveCommand}" Width="100" Margin="5"/>
+                <Button Content="Отмена" Command="{Binding CancelCommand}" Width="100" Margin="5"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
+</Window>

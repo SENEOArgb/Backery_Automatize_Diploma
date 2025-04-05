@@ -1,0 +1,18 @@
+﻿    User.cs
+    
+    [NotMapped]
+    public string UserRoleName { get; set; } = null!;
+
+    [NotMapped]
+    public string FullName => UserName + " " + UserSurname;
+
+
+    RawMaterialsWarehousesProducts.cs
+
+
+    [NotMapped]
+    public DateTime DateSupplyOrProduction {  get; set; }
+
+    [NotMapped]
+
+    public DateTime ExpirationDate => DateSupplyOrProduction.AddDays(RawMaterial.ShelfLifeDays);

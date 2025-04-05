@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+
+namespace App_Automatize_Backery.View.UserControls_Pages_.TechnologPages
+{
+    /// <summary>
+    /// Логика взаимодействия для RawMaterialCreateEditWindow.xaml
+    /// </summary>
+    public partial class RawMaterialCreateEditWindow : Window
+    {
+        public RawMaterialCreateEditWindow()
+        {
+            InitializeComponent();
+        }
+    }
+}
