@@ -12,7 +12,7 @@
             <TextBlock HorizontalAlignment="Left" Text="Сырье в заявке" FontSize="20" FontWeight="Bold" Margin="10,5,0,10"/>
             <Button Content="Добавить сырье в заявку" 
                     Command="{Binding AddRawMaterialToRequestCommand}" 
-                    Width="200" 
+                    Width="233" 
                     Margin="0 -35 0 10" 
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding CanAddRawMaterial}"
