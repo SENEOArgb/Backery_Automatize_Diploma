@@ -5,45 +5,83 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="800" d:DesignWidth="1280"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:RMViewModel}">
 
-    <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Width="95" Height="40" VerticalAlignment="Top" >
-            <Button Content="Создать" Command="{Binding CreateCommand}" Margin="5"/>
-        </StackPanel>
+    <Grid Background="{DynamicResource MaterialDesignPaper}">
+        <materialDesign:Card Margin="0" Padding="16" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-        <DataGrid x:Name="rawMaterials" Grid.Row="1" ItemsSource="{Binding RawMaterials}" AutoGenerateColumns="False" 
-                  HeadersVisibility="Column" CanUserAddRows="False" 
-                  CanUserDeleteRows="False" CanUserResizeColumns="True"
-                  Margin="0 70 0 0" Padding="10"
-                  Style="{StaticResource MaterialDesignDataGrid}"
-                  SelectedItem="{Binding SelectedRawMaterial}">
+                <!-- Верхняя панель -->
+                <DockPanel Grid.Row="0" LastChildFill="False" Margin="0 0 0 16">
+                    <TextBlock Text="Список номенклатур сырья:"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Margin="400 0 0 0"
+                               Foreground="{DynamicResource PrimaryHueMidBrush}"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               DockPanel.Dock="Left"/>
 
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding RawMaterialName}" Width="Auto"/>
-                <DataGridTextColumn Header="Срок годности (дни)" Binding="{Binding ShelfLifeDays, StringFormat={}{0} д.}" Width="150"/>
-                <DataGridTextColumn Header="Цена" Binding="{Binding RawMaterialCoast, StringFormat={}{0} руб.}" Width="80"/>
-                <DataGridTextColumn Header="Ед. измерения" Binding="{Binding MeasurementUnit.MeasurementUnitName}" Width="120"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                        <Button Command="{Binding CreateCommand}" Style="{StaticResource MaterialDesignFlatButton}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
+                                <TextBlock Text="Создать" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
 
-                <!-- Кнопка Редактировать -->
-                <DataGridTemplateColumn Header="Редактировать">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="✎" Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <!-- Таблица -->
+                <DataGrid x:Name="rawMaterials"
+                          Grid.Row="1"
+                          ItemsSource="{Binding RawMaterials}"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          CanUserResizeColumns="True"
+                          IsReadOnly="True"
+                          Style="{StaticResource MaterialDesignDataGrid}"
+                          SelectedItem="{Binding SelectedRawMaterial}"
+                          RowHeaderWidth="0"
+                          Margin="0">
 
-                <!-- Кнопка Удалить -->
-                <DataGridTemplateColumn Header="Удалить">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="🗑" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Наименование" Binding="{Binding RawMaterialName}" Width="300" />
+                        <DataGridTextColumn Header="Срок годности (дни)" Binding="{Binding ShelfLifeDays, StringFormat={}{0} д.}" Width="160" />
+                        <DataGridTextColumn Header="Цена" Binding="{Binding RawMaterialCoast, StringFormat={}{0} руб.}" Width="100" />
+                        <DataGridTextColumn Header="Ед. измерения" Binding="{Binding MeasurementUnit.MeasurementUnitName}" Width="150" />
+
+                        <!-- Кнопка Редактировать -->
+                        <DataGridTemplateColumn Header="      Действия" Width="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Button Style="{StaticResource MaterialDesignToolButton}"
+                                            ToolTip="Редактировать" Margin="0 0 0 0 "
+                                            Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}">
+                                            <materialDesign:PackIcon Kind="Pencil" Width="20" Height="20"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignToolButton}"
+                                            ToolTip="Удалить" Margin="50 0 0 0 "
+                                            Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}">
+                                            <materialDesign:PackIcon Kind="Delete" Width="20" Height="20"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </materialDesign:Card>
     </Grid>
 </UserControl>

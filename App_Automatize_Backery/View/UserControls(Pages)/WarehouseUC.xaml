@@ -7,12 +7,20 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
              xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:WarehouseViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="8000" d:DesignWidth="1280"
              Background="{DynamicResource MaterialDesignPaper}">
 
     <Grid>
-        <StackPanel Orientation="Vertical" Margin="20" HorizontalAlignment="Center">
-            <!-- Панель кнопок с линией под выбранной кнопкой -->
+        <StackPanel Orientation="Vertical" Margin="20">
+            <!-- Заголовок -->
+            <TextBlock Text="Склады"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       Margin="530,0,0,10"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}"
+                       />
+
+            <!-- Кнопки-переключатели -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -25,7 +33,7 @@
                         Padding="15,5"
                         FontSize="16"
                         Background="Transparent"
-                        Foreground="Black"
+                        Foreground="{DynamicResource PrimaryHueMidBrush}"
                         BorderThickness="0"
                         Grid.Column="0"/>
 
@@ -36,21 +44,27 @@
                         Padding="15,5"
                         FontSize="16"
                         Background="Transparent"
-                        Foreground="Black"
+                        Foreground="{DynamicResource PrimaryHueMidBrush}"
                         BorderThickness="0"
                         Grid.Column="2"/>
             </Grid>
 
             <!-- Подчеркивающая линия -->
             <Grid Margin="0,5,0,10">
-                <Border Height="3" Background="Orange"
+                <Border Height="3" Background="{DynamicResource SecondaryAccentBrush}"
                         Width="{Binding SelectedIndicatorWidth}"
                         HorizontalAlignment="Left"
                         Margin="{Binding SelectedIndicatorMargin}"/>
             </Grid>
 
-            <!-- Контент-контрол для загрузки UserControl -->
-            <ContentControl Content="{Binding CurrentView}" Margin="10"/>
+            <!-- Контейнер с контентом -->
+            <Border Background="{DynamicResource MaterialDesignCardBackground}" 
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0"
+                    Effect="{DynamicResource MaterialDesignElevation3}">
+                <ContentControl Content="{Binding CurrentView}" />
+            </Border>
         </StackPanel>
     </Grid>
 </UserControl>

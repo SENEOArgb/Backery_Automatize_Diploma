@@ -3,19 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:App_Automatize_Backery.View.SupportControls" xmlns:supportviewmodel="clr-namespace:App_Automatize_Backery.ViewModels.SupportViewModel" d:DataContext="{d:DesignInstance Type=supportviewmodel:PWarehouseViewModel}"
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.SupportControls" xmlns:supportviewmodel="clr-namespace:App_Automatize_Backery.ViewModels.SupportViewModel" 
+             d:DataContext="{d:DesignInstance Type=supportviewmodel:PWarehouseViewModel}" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             d:DesignHeight="600" d:DesignWidth="1000">
+    <Grid Margin="10">
         <DataGrid ItemsSource="{Binding WarehouseItems}"
                   AutoGenerateColumns="False"
-                  Margin="10"
-                  IsReadOnly="True">
+                  IsReadOnly="True"
+                  RowHeight="40"
+                  FontSize="14"
+                  AlternatingRowBackground="{DynamicResource MaterialDesignPaperDark}"
+                  AlternationCount="2"
+                  SelectionUnit="FullRow"
+                  SelectionMode="Single"
+                  materialDesign:DataGridAssist.CellPadding="8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="12"
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  MaxHeight="500"
+                  Background="{DynamicResource MaterialDesignPaper}"
+                  GridLinesVisibility="None">
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID Продукта:" Binding="{Binding ProductId}"/>
-                <DataGridTextColumn Header="Название:" Binding="{Binding Product.ProductName}"/>
-                <DataGridTextColumn Header="Количество,шт:" Binding="{Binding RawMaterialCount}"/>
-                <DataGridTextColumn Header="Произведено:" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}"/>
+                <DataGridTextColumn Header="ID Продукта" Binding="{Binding ProductId}"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Product.ProductName}"/>
+                <DataGridTextColumn Header="Количество, шт" Binding="{Binding RawMaterialCount}"/>
+                <DataGridTextColumn Header="Произведено" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

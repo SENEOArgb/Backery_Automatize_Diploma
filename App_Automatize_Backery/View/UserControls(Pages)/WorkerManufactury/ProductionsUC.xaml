@@ -3,52 +3,64 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_.WorkerManufactury" xmlns:productionsvm="clr-namespace:App_Automatize_Backery.ViewModels.ProductionsVM" d:DataContext="{d:DesignInstance Type=productionsvm:ProductionViewModel}"
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_.WorkerManufactury" 
+             xmlns:productionsvm="clr-namespace:App_Automatize_Backery.ViewModels.ProductionsVM" d:DataContext="{d:DesignInstance Type=productionsvm:ProductionViewModel}"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
-    <Grid>
+    <Grid Background="{DynamicResource MaterialDesignPaper}" Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="260" />
-            <RowDefinition Height="170" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок и кнопка создания -->
-        <StackPanel Orientation="Horizontal" Margin="10,10,10,10">
-            <TextBlock Text="Список производств" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/>
+        <!-- Заголовок и кнопка -->
+        <DockPanel Margin="0,0,0,16">
+            <TextBlock Text="Производственные записи:"
+                       FontSize="28" Margin="420 0 0 0"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" />
             <Button Content="Создать производство"
                     Command="{Binding CreateProductionCommand}"
-                    Margin="20,0,0,0" />
-        </StackPanel>
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Margin="140,0,0,0" Width="200"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"
+                    Padding="12,6" />
+        </DockPanel>
 
-        <!-- Список производств -->
-        <DataGrid Grid.Row="1" Height="280" VerticalAlignment="Center"
+        <!-- Таблица производств -->
+        <DataGrid Grid.Row="1"
                   ItemsSource="{Binding Productions}"
                   SelectedItem="{Binding SelectedProduction}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+                  RowHeaderWidth="0"
+                  Margin="0,0,0,10"
+                  materialDesign:DataGridAssist.CellPadding="8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="10"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  Style="{StaticResource MaterialDesignDataGrid}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Дата начала" Binding="{Binding DateTimeStart, StringFormat='dd.MM.yyyy HH:mm'}" Width="250" />
-                <DataGridTextColumn Header="Дата окончания" Binding="{Binding DateTimeEnd, StringFormat='dd.MM.yyyy HH:mm'}" Width="250" />
-
-                <!-- Просмотр деталей -->
-                <DataGridTemplateColumn Header="Детали">
+                <DataGridTextColumn Header="Дата начала" Binding="{Binding DateTimeStart, StringFormat='dd.MM.yyyy HH:mm'}" Width="200" />
+                <DataGridTextColumn Header="Дата окончания" Binding="{Binding DateTimeEnd, StringFormat='dd.MM.yyyy HH:mm'}" Width="200" />
+                <DataGridTemplateColumn Header="Детали" Width="200">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Просмотреть"
-                    Command="{Binding DataContext.ViewProductionDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    CommandParameter="{Binding}" />
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding DataContext.ViewProductionDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
-                <!-- Удаление -->
-                <DataGridTemplateColumn Header="Отменить">
+                <DataGridTemplateColumn Header="Удалить" Width="200">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Отменить"
+                                    Style="{StaticResource MaterialDesignFlatButton}"
                                     Command="{Binding DataContext.DeleteProductionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding}" />
                         </DataTemplate>
@@ -57,7 +69,10 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Динамическое отображение деталей -->
-        <ContentControl Height="200" Grid.Row="1" Content="{Binding CurrentDetailsView}" VerticalAlignment="Top" Margin="0,230,0,0" Grid.RowSpan="2" />
+        <!-- Динамический ContentControl для деталей -->
+        <ContentControl Grid.Row="2"
+                        Content="{Binding CurrentDetailsView}"
+                        Margin="0"
+                        VerticalAlignment="Top" />
     </Grid>
 </UserControl>

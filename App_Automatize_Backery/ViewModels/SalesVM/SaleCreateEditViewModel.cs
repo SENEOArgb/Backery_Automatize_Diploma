@@ -538,7 +538,7 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                 // Получаем все партии товара, отсортированные по дате (FIFO)
                 var warehouseProducts = _context.RawMaterialsWarehousesProducts
                     .Where(wp => wp.ProductId == saleProduct.ProductId)
-                    .OrderBy(wp => wp.DateSupplyOrProduction)
+                    .OrderBy(wp => wp.DateSupplyOrProduction)//если не будет работать списание для Прямой - убрать
                     .ToList();
 
                 foreach (var warehouseProduct in warehouseProducts)
