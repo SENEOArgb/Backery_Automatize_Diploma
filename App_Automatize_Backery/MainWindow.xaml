@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:App_Automatize_Backery"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="650" Width="1200" Style="{StaticResource MaterialDesignWindow}" >
+        Background="{DynamicResource MaterialDesignPaper}" WindowStartupLocation="CenterScreen"
+        Title="Панель управления мини-пекарней" Height="800" Width="1280" Style="{StaticResource MaterialDesignWindow}" >
     <Window.Resources>
         <!-- Стилизация затемняющего слоя -->
         <SolidColorBrush x:Key="DarkOverlayBrush" Color="#80000000"/>
@@ -39,26 +40,70 @@
 
         <!-- Боковое меню -->
         <Grid x:Name="Drawer" Width="250" Background="DimGray" Opacity="0.70" HorizontalAlignment="Left" VerticalAlignment="Top"
-              Panel.ZIndex="3">
+              Panel.ZIndex="3" >
             <Grid.RenderTransform>
                 <TranslateTransform X="-250" Y="55" />
             </Grid.RenderTransform>
-            <StackPanel Height="auto">
-                <Button Content="Сырье" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowRawMaterialsCommand}"/>
-                <Button Content="Склады" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowWarehouseCommand}"/>
-                <Button Content="Продукты" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductsCommand}"/>
-                <Button Content="Производство" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductionCommand}"/>
-                <Button Content="Пользователь" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowUserCommand}"/>
-                <Button Content="Поставки" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSupplyCommand}"/>
-                <Button Content="Продажи" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSaleCommand}"/>
-                <Button Content="Оборудование" Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowEquipmentCommand}"/>
+            <StackPanel Height="auto" Margin="0">
+
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowRawMaterialsCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Raw" Margin="0,0,10,0"/>
+                        <TextBlock Text="Сырьё"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowWarehouseCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Warehouse" Margin="0,0,10,0"/>
+                        <TextBlock Text="Склады"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductsCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Food" Margin="0,0,10,0"/>
+                        <TextBlock Text="Продукты"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductionCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Manufacturing" Margin="0,0,10,0"/>
+                        <TextBlock Text="Производство"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowUserCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="User" Margin="0,0,10,0"/>
+                        <TextBlock Text="Пользователь"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSupplyCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="DeliveryDining" Margin="0,0,10,0"/>
+                        <TextBlock Text="Поставки"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSaleCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Sale" Margin="0,0,10,0"/>
+                        <TextBlock Text="Продажи"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
 
         <!-- Основной контент -->
-        <Grid Height="Auto" Panel.ZIndex="3">
-            <Button Grid.Row="0" Content="☰ Меню" Width="110" Height="40" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0 5 0 0"
-                    Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Background="DarkGray" Click="ToggleMenuButton_Click"/>
+        <Grid Panel.ZIndex="3">
+            <!-- Кнопка меню -->
+            <Button Content="☰" ToolTip="Меню" Width="48" Height="48" Margin="10" 
+            Style="{StaticResource MaterialDesignToolButton}" 
+            Click="ToggleMenuButton_Click" Panel.ZIndex="3"
+            VerticalAlignment="Top" HorizontalAlignment="Left" 
+            Background="{DynamicResource PrimaryHueMidBrush}" 
+            Foreground="Black"/>
+
+            <!-- Заголовок -->
+            <TextBlock Text="Панель управления" FontSize="22" FontWeight="Bold" Margin="70,20,0,0"
+               VerticalAlignment="Top" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
         </Grid>
         <ContentControl Content="{Binding CurrentView}" Margin="10,55,10,10" Panel.ZIndex="0"/>
     </Grid>

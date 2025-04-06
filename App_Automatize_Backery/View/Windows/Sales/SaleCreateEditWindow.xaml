@@ -57,7 +57,7 @@
 
         <!-- Время продажи -->
         <TextBlock Text="Время:" Grid.Row="2" VerticalAlignment="Center" />
-        <materialDesign:TimePicker x:Name="selTime"
+        <materialDesign:TimePicker Is24Hours="True" x:Name="selTime"
                            Style="{StaticResource MaterialDesignTimePicker}"
                            Grid.Column="1" Grid.Row="2" Width="250">
             <materialDesign:TimePicker.SelectedTime>

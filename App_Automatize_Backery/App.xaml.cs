@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
@@ -20,6 +21,9 @@ namespace App_Automatize_Backery
 
         public App()
         {
+            CultureInfo cultureInfo = new CultureInfo("ru-RU");
+            Thread.CurrentThread.CurrentCulture = cultureInfo;
+            Thread.CurrentThread.CurrentUICulture = cultureInfo;
             InitializeComponent();
             DbContext = new MinBakeryDbContext();
         }

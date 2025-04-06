@@ -24,6 +24,8 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM
         public ObservableCollection<Production> Productions { get; set; }
         public Production SelectedProduction { get; set; }
 
+
+        private Production _currentProductionDetails;
         public Sale sale { get; set; }
         public object CurrentDetailsView { get; set; }
 
@@ -88,12 +90,24 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM
 
         private void ShowDetails(Production production)
         {
-            if (production == null) return;
+            if (production == null)
+                return;
 
-            CurrentDetailsView = new ProductionDetailsUC
+            if (_currentProductionDetails == production)
             {
-                DataContext = new ProductionDetailsViewModel(production)
-            };
+                // Если повторно нажали на тот же элемент — скрываем
+                CurrentDetailsView = null;
+                _currentProductionDetails = null;
+            }
+            else
+            {
+                // Иначе отображаем детали
+                CurrentDetailsView = new ProductionDetailsUC
+                {
+                    DataContext = new ProductionDetailsViewModel(production)
+                };
+                _currentProductionDetails = production;
+            }
 
             OnPropertyChanged(nameof(CurrentDetailsView));
         }

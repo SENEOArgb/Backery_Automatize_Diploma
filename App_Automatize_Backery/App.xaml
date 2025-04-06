@@ -6,11 +6,11 @@
     xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
     xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    xmlns:helpers="clr-namespace:App_Automatize_Backery.Helper.Converters" xmlns:System="clr-namespace:System.Globalization;assembly=System.Globalization">
+    xmlns:System="clr-namespace:System.Globalization;assembly=System.Globalization" xmlns:helpers="clr-namespace:App_Automatize_Backery.Helper.Converters">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:CustomColorTheme BaseTheme="Light" PrimaryColor="Aqua" SecondaryColor="DarkGreen" />
+                <materialDesign:CustomColorTheme BaseTheme="Light" PrimaryColor="SaddleBrown" SecondaryColor="DarkGreen" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -20,7 +20,6 @@
             <helpers:SaleStatusToIsEnabledConverter x:Key="SaleStatusToIsEnabledConverter"/>
             <helpers:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <helpers:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
-            <System:CultureInfo x:Key="AppCulture" Name="en-US"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

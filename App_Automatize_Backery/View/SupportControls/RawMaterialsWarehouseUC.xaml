@@ -4,18 +4,30 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:App_Automatize_Backery.View.SupportControls" xmlns:supportviewmodel="clr-namespace:App_Automatize_Backery.ViewModels.SupportViewModel" d:DataContext="{d:DesignInstance Type=supportviewmodel:RMWarehouseViewModel}"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             mc:Ignorable="d" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             d:DesignHeight="600" d:DesignWidth="1000">
+    <Grid Margin="10">
         <DataGrid ItemsSource="{Binding WarehouseItems}"
                   AutoGenerateColumns="False"
-                  Margin="10"
-                  IsReadOnly="True">
+                  IsReadOnly="True"
+                  RowHeight="40"
+                  FontSize="14"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  AlternationCount="2"
+                  Background="{DynamicResource MaterialDesignPaper}"
+                  AlternatingRowBackground="{DynamicResource MaterialDesignPaperDark}"
+                  materialDesign:DataGridAssist.CellPadding="8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="12"
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  MaxHeight="500"
+                  GridLinesVisibility="None">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID Сырья:" Binding="{Binding RawMaterialId}"/>
-                <DataGridTextColumn Header="Название:" Binding="{Binding RawMaterial.RawMaterialName}"/>
-                <DataGridTextColumn Header="Количество,кг|л:" Binding="{Binding RawMaterialCount}"/>
-                <DataGridTextColumn Header="Поставка от:" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}"/>
+                <DataGridTextColumn Header="ID Сырья" Binding="{Binding RawMaterialId}"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding RawMaterial.RawMaterialName}"/>
+                <DataGridTextColumn Header="Количество, кг/л" Binding="{Binding RawMaterialCount}"/>
+                <DataGridTextColumn Header="Поступление" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
