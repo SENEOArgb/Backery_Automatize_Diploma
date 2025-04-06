@@ -10,18 +10,18 @@
     <Grid>
         <StackPanel Margin="10">
             <!-- Заголовок -->
-            <TextBlock Text="Продукты в продаже" FontSize="22" FontWeight="Bold"
-                       Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,0,10"/>
+            <TextBlock Text="Продукты в продаже:" FontSize="22" FontWeight="Bold"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="470,0,0,10"/>
 
             <!-- Таблица продуктов -->
             <DataGrid ItemsSource="{Binding SaleProducts}" SelectedItem="{Binding SelectedSaleProduct}"
                       AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40"
-                      SelectionMode="Single"
+                      SelectionMode="Single" CanUserResizeRows="False" CanUserResizeColumns="False"
                       AlternatingRowBackground="{DynamicResource MaterialDesignPaper}">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Продукт" Binding="{Binding Product.ProductName}" Width="200"/>
-                    <DataGridTextColumn Header="Количество" Binding="{Binding CountProductSale}" Width="100"/>
+                    <DataGridTextColumn Header="Количество,шт" Binding="{Binding CountProductSale}" Width="150"/>
                     <DataGridTextColumn Header="Стоимость" Binding="{Binding CoastToProduct, StringFormat={}{0} руб.}" Width="100"/>
                 </DataGrid.Columns>
             </DataGrid>

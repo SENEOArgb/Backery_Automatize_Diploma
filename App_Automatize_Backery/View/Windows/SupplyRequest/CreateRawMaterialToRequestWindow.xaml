@@ -20,9 +20,6 @@
             <TextBlock Text="Количество" FontSize="16" Margin="10"/>
             <TextBox x:Name="CountTextBox" Margin="10" Text="{Binding CountRawMaterial}"/>
 
-            <TextBlock Text="Стоимость" FontSize="16" Margin="10"/>
-            <TextBox x:Name="CostTextBox" Margin="10" Text="{Binding SupplyCoastToMaterial}"/>
-
             <Button Content="Сохранить" Command="{Binding SaveRawMaterialCommand}" Width="100" Margin="10" HorizontalAlignment="Right"/>
         </StackPanel>
     </Grid>

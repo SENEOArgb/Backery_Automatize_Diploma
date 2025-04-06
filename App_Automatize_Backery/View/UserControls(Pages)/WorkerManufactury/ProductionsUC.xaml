@@ -22,13 +22,18 @@
                        FontWeight="Bold"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource PrimaryHueMidBrush}" />
-            <Button Content="Создать производство"
+            <Button
                     Command="{Binding CreateProductionCommand}"
-                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="140,0,0,0" Width="200"
                     VerticalAlignment="Center"
                     DockPanel.Dock="Right"
-                    Padding="12,6" />
+                    Padding="12,6" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
+                    <TextBlock Text="Создать" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
         </DockPanel>
 
         <!-- Таблица производств -->
@@ -42,26 +47,17 @@
                   materialDesign:DataGridAssist.CellPadding="8"
                   materialDesign:DataGridAssist.ColumnHeaderPadding="10"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  Style="{StaticResource MaterialDesignDataGrid}">
+                  Style="{StaticResource MaterialDesignDataGrid}"
+                  CanUserResizeRows="False" CanUserResizeColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Дата начала" Binding="{Binding DateTimeStart, StringFormat='dd.MM.yyyy HH:mm'}" Width="200" />
-                <DataGridTextColumn Header="Дата окончания" Binding="{Binding DateTimeEnd, StringFormat='dd.MM.yyyy HH:mm'}" Width="200" />
-                <DataGridTemplateColumn Header="Детали" Width="200">
+                <DataGridTextColumn Header="Дата начала" Binding="{Binding DateTimeStart, StringFormat='dd.MM.yyyy HH:mm'}" Width="*" />
+                <DataGridTextColumn Header="Дата окончания" Binding="{Binding DateTimeEnd, StringFormat='dd.MM.yyyy HH:mm'}" Width="*" />
+                <DataGridTemplateColumn Header="                                                Детали" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Просмотреть"
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     Command="{Binding DataContext.ViewProductionDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Удалить" Width="200">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Отменить"
-                                    Style="{StaticResource MaterialDesignFlatButton}"
-                                    Command="{Binding DataContext.DeleteProductionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

@@ -42,12 +42,21 @@ namespace App_Automatize_Backery.ViewModels
                 }
             }
         }
-        public bool IsManager => CurrentUser?.UserRoleId == 1;  // Зав. производством
-        public bool IsWorker => CurrentUser?.UserRoleId == 2;   // Сотрудник на производстве
+        public bool IsManager => CurrentUser?.UserRoleId == 2;  // Зав. производством
+        public bool IsWorker => CurrentUser?.UserRoleId == 3;   // Сотрудник на производстве
+
+        public bool IsTechnolog => CurrentUser?.UserRoleId == 1;
 
         // Свойство для скрытия кнопки меню, если нет доступа
         public Visibility ManagerMenuVisibility => IsManager ? Visibility.Visible : Visibility.Collapsed;
         public Visibility WorkerMenuVisibility => IsWorker ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility TechnologistVisibility => IsTechnolog ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility RawMaterialsVisibility => IsWorker ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ProductsVisibility => IsWorker ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility SalesVisibility => IsTechnolog ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility SupplyVisibility => IsTechnolog ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ProductionVisibility => IsTechnolog ? Visibility.Collapsed : Visibility.Visible;
 
         public User CurrentUser { get; set; }  // Новое свойство для текущего пользователя
 

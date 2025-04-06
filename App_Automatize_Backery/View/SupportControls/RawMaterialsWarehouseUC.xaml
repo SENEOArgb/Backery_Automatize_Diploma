@@ -22,7 +22,8 @@
                   ScrollViewer.CanContentScroll="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   MaxHeight="500"
-                  GridLinesVisibility="None">
+                  GridLinesVisibility="None"
+                  CanUserResizeRows="False" CanUserResizeColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID Сырья" Binding="{Binding RawMaterialId}"/>
                 <DataGridTextColumn Header="Название" Binding="{Binding RawMaterial.RawMaterialName}"/>

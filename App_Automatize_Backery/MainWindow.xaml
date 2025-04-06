@@ -46,7 +46,7 @@
             </Grid.RenderTransform>
             <StackPanel Height="auto" Margin="0">
 
-                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowRawMaterialsCommand}">
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowRawMaterialsCommand}" Visibility="{Binding RawMaterialsVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Raw" Margin="0,0,10,0"/>
                         <TextBlock Text="Сырьё"/>
@@ -58,13 +58,13 @@
                         <TextBlock Text="Склады"/>
                     </StackPanel>
                 </Button>
-                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductsCommand}">
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductsCommand}" Visibility="{Binding ProductsVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Food" Margin="0,0,10,0"/>
                         <TextBlock Text="Продукты"/>
                     </StackPanel>
                 </Button>
-                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductionCommand}">
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductionCommand}" Visibility="{Binding ProductionVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Manufacturing" Margin="0,0,10,0"/>
                         <TextBlock Text="Производство"/>
@@ -76,13 +76,13 @@
                         <TextBlock Text="Пользователь"/>
                     </StackPanel>
                 </Button>
-                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSupplyCommand}">
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSupplyCommand}" Visibility="{Binding SupplyVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="DeliveryDining" Margin="0,0,10,0"/>
                         <TextBlock Text="Поставки"/>
                     </StackPanel>
                 </Button>
-                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSaleCommand}">
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowSaleCommand}" Visibility="{Binding SalesVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Sale" Margin="0,0,10,0"/>
                         <TextBlock Text="Продажи"/>
