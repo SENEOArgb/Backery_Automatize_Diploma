@@ -3,50 +3,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages"
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="{DynamicResource MaterialDesignPaper}">
 
     <Grid>
-        <StackPanel Orientation="Vertical" Margin="20">
+        <StackPanel Margin="20">
             <TextBlock HorizontalAlignment="Left" Text="Сырье в заявке" FontSize="20" FontWeight="Bold" Margin="10,5,0,10"/>
-            <Button Content="Добавить сырье в заявку" 
+            <Button
                     Command="{Binding AddRawMaterialToRequestCommand}" 
                     Width="200" 
                     Margin="0 -35 0 10" 
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding CanAddRawMaterial}"
-                    Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                    Style="{StaticResource MaterialDesignFlatButton}" 
+                    Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
+                    <TextBlock Text="Добавить сырье в заявку" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
 
             <DataGrid ItemsSource="{Binding SupplyRequestsRawMaterials}" 
-          SelectedItem="{Binding SelectedRawMaterial}" 
-          AutoGenerateColumns="False" 
-          IsReadOnly="True"
-          ScrollViewer.VerticalScrollBarVisibility="Auto" Height="270">
+                      SelectedItem="{Binding SelectedRawMaterial}" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True" CanUserResizeRows="False" CanUserResizeColumns="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto" Height="270">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Склад" Binding="{Binding Warehouse.WarehouseName}" Width="Auto"/>
                     <DataGridTextColumn Header="Сырье" Binding="{Binding RawMaterial.RawMaterialName}" Width="Auto"/>
                     <DataGridTextColumn Header="Количество" Binding="{Binding CountRawMaterial}" Width="Auto"/>
-                    <DataGridTextColumn Header="Стоимость" Binding="{Binding SupplyCoastToMaterial,  StringFormat={}{0} руб.}" Width="Auto"/>
+                    <DataGridTextColumn Header="Стоимость" Binding="{Binding SupplyCoastToMaterial, StringFormat={}{0} руб.}" Width="Auto"/>
 
-                    <!-- Колонка с кнопками действий -->
                     <DataGridTemplateColumn Header="Действия">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                        Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                     <Button Content="✎" 
-                        Command="{Binding DataContext.EditRawMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                        CommandParameter="{Binding}" 
-                        ToolTip="Редактировать" 
-                        Margin="5" 
-                        IsEnabled="{Binding DataContext.CanEditRawMaterial, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                            Command="{Binding DataContext.EditRawMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}" 
+                                            ToolTip="Редактировать" 
+                                            Margin="5" 
+                                            IsEnabled="{Binding DataContext.CanEditRawMaterial, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
                                     <Button Content="🗑" 
-                        Command="{Binding DataContext.DeleteRawMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                        CommandParameter="{Binding}" 
-                        ToolTip="Удалить" 
-                        Margin="5" 
-                        IsEnabled="{Binding DataContext.CanDeleteRawMaterial, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                            Command="{Binding DataContext.DeleteRawMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}" 
+                                            ToolTip="Удалить" 
+                                            Margin="5" 
+                                            IsEnabled="{Binding DataContext.CanDeleteRawMaterial, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

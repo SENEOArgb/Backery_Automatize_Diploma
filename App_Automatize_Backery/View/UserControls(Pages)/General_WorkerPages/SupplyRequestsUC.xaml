@@ -7,86 +7,63 @@
              xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" d:DataContext="{d:DesignInstance Type=viewmodels:SupplyRequestViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"             Background="{DynamicResource MaterialDesignPaper}">
+             d:DesignHeight="800" d:DesignWidth="1200"             Background="{DynamicResource MaterialDesignPaper}">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="280"/>
-            <!-- Верхняя часть с заявками -->
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <!-- Нижняя часть для UserControl -->
         </Grid.RowDefinitions>
 
-        <!-- Список заявок -->
-        <StackPanel Margin="20" Grid.Row="0">
-            <TextBlock HorizontalAlignment="Left" Text="Список заявок" FontSize="20" FontWeight="Bold" Margin="10,5,0,10"/>
-            <Button Content="Создать заявку" Command="{Binding CreateSupplyRequestCommand}" 
+        <!-- Заголовок и кнопка создания заявки -->
+        <StackPanel Grid.Row="0" Margin="20">
+            <TextBlock HorizontalAlignment="Center" Text="Список заявок" FontSize="24" FontWeight="Bold" Margin="10,-50,0,10"/>
+            <Button Command="{Binding CreateSupplyRequestCommand}" 
                     Visibility="{Binding ManagerVisibility}" HorizontalAlignment="Center" 
-                    VerticalAlignment="Top" Margin="10,-35,5,10" Height="35"/>
+                    VerticalAlignment="Top" Margin="10,0,5,10" Height="35"
+                    Style="{StaticResource MaterialDesignFlatButton}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
+                    <TextBlock Text="Создать" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
 
-            <DataGrid x:Name="supplyRequest" Height="260" ItemsSource="{Binding SupplyRequests}" HeadersVisibility="All"
-                      SelectedItem="{Binding SelectedRequest, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                      AutoGenerateColumns="False" IsReadOnly="True" Style="{StaticResource MaterialDesignDataGrid}"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <!-- Таблица заявок -->
+            <DataGrid x:Name="supplyRequest" Height="300" ItemsSource="{Binding SupplyRequests}" 
+                      SelectedItem="{Binding SelectedRequest, Mode=TwoWay}" CanUserResizeRows="False" CanUserResizeColumns="False"
+                      AutoGenerateColumns="False" IsReadOnly="True" MaxHeight="350"
+                      Style="{StaticResource MaterialDesignDataGrid}" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Дата" Binding="{Binding SupplyRequestDate, StringFormat='dd.MM.yyyy HH:mm'}" Width="Auto"/>
                     <DataGridTextColumn Header="Статус" Binding="{Binding Status.StatusName}" Width="Auto"/>
-                    <DataGridTextColumn Header="Цена" Binding="{Binding TotalSalary,  StringFormat={}{0} руб.}" Width="Auto"/>
+                    <DataGridTextColumn Header="Цена" Binding="{Binding TotalSalary, StringFormat={}{0} руб.}" Width="Auto"/>
+
                     <!-- Кнопка "Просмотреть" -->
-                    <DataGridTemplateColumn Header="Просмотреть" Width="Auto">
+                    <DataGridTemplateColumn Header="                                Действия" Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Просмотреть"
+                                <StackPanel Width="Auto" Orientation="Horizontal">
+                                    <Button Content="Просмотреть" 
                                         Command="{Binding DataContext.ViewSupplyRequestMaterialsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                        CommandParameter="{Binding}"
-                                        Background="DodgerBlue" 
-                                        Foreground="White"
-                                        Padding="5"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTemplateColumn Header="Редактировать" Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Редактировать"
-                    Command="{Binding DataContext.EditSupplyRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    CommandParameter="{Binding}"
-                    Background="Orange" 
-                    Foreground="White"
-                    Padding="5"
-                    Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                    IsEnabled="{Binding StatusId, Converter={StaticResource StatusToEnabledConverter}}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTemplateColumn Header="Действия">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
+                                        CommandParameter="{Binding}" 
+                                        Background="DarkBlue" 
+                                        Foreground="White" Padding="5" />
+                                    <Button Content="Редактировать"
+                                        Command="{Binding DataContext.EditSupplyRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" Margin="40 0 0 0"
+                                        Background="Orange" Foreground="White" Padding="5"
+                                        Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                    <Button Content="Отменить" 
+                                        Command="{Binding DataContext.DeleteSupplyRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" Margin="40 0 0 0"
+                                        Background="Red" Foreground="White" Padding="5"
+                                        Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                                     <Button Content="Принять" 
-                        Command="{Binding DataContext.AcceptRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        CommandParameter="{Binding}" 
-                        Visibility="{Binding DataContext.AcceptButtonVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                        IsEnabled="{Binding StatusId, Converter={StaticResource StatusToEnabledConverter}}"/>
+                                        Command="{Binding DataContext.AcceptRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" Margin="40 0 0 0"
+                                        Visibility="{Binding DataContext.AcceptButtonVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                        IsEnabled="{Binding StatusId, Converter={StaticResource StatusToEnabledConverter}}"/>
                                 </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <!-- Кнопка "Удалить" -->
-                    <DataGridTemplateColumn Header="Удалить" Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Удалить" 
-                    Command="{Binding DataContext.DeleteSupplyRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    CommandParameter="{Binding}" 
-                    Background="Red" 
-                    Foreground="White"
-                    Padding="5"
-                    Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                    IsEnabled="{Binding StatusId, Converter={StaticResource StatusToEnabledConverter}}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -94,9 +71,8 @@
             </DataGrid>
         </StackPanel>
 
-        <Border/>
+        <Separator Margin="0 420 0 0"/>
 
-        <!-- ContentControl для отображения вложенного UserControl -->
-        <ContentControl Content="{Binding CurrentContent}" Margin="0,0,20,-90" Grid.Row="1"/>
+        <ContentControl Content="{Binding CurrentContent}" Margin="0,0,20,0" Grid.Row="1"/>
     </Grid>
 </UserControl>

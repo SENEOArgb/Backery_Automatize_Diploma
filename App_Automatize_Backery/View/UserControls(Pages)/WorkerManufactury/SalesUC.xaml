@@ -10,18 +10,23 @@
     <Grid>
         <StackPanel Margin="10">
             <!-- Заголовок -->
-            <TextBlock Text="Продажи" FontSize="24" FontWeight="Bold" 
+            <TextBlock Text="Список записей продаж:" FontSize="24" FontWeight="Bold" 
                        Foreground="{DynamicResource PrimaryHueMidBrush}" 
-                       Margin="0,0,0,10"/>
+                       Margin="450,0,0,10"/>
 
             <!-- Кнопка создания -->
-            <Button Content="Создать продажу" Command="{Binding CreateSaleCommand}"
-                    Style="{StaticResource MaterialDesignRaisedButton}" Height="40" Margin="0,0,0,10"/>
+            <Button Command="{Binding CreateSaleCommand}" Width="200"
+                    Style="{StaticResource MaterialDesignRaisedButton}" Height="40" Margin="0,20,0,10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
+                    <TextBlock Text="Создать" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
 
             <!-- Таблица с продажами -->
-            <DataGrid ItemsSource="{Binding Sales}" SelectedItem="{Binding SelectedSale}" 
+            <DataGrid ItemsSource="{Binding Sales}" SelectedItem="{Binding SelectedSale}" Margin="0 50 0 0"
                       AutoGenerateColumns="False" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      RowHeight="40" GridLinesVisibility="None" MaxHeight="200" Height="200"
+                      RowHeight="40" GridLinesVisibility="None" MaxHeight="200" Height="200" CanUserResizeRows="False" CanUserResizeColumns="False"
                       SelectionMode="Single" AlternatingRowBackground="{DynamicResource MaterialDesignPaper}">
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
@@ -30,33 +35,23 @@
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Тип продажи" Binding="{Binding TypeSale}" Width="130"/>
-                    <DataGridTextColumn Header="Дата продажи" Binding="{Binding DateTimeSale, StringFormat='dd.MM.yyyy HH:mm'}" Width="140"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding SaleStatus}" Width="100"/>
-                    <DataGridTextColumn Header="Стоимость" Binding="{Binding CoastSale, StringFormat={}{0} руб.}" Width="100"/>
-                    <DataGridTemplateColumn Header="Действия" Width="250">
+                    <DataGridTextColumn Header="      Тип продажи" Binding="{Binding TypeSale}" Width="130"/>
+                    <DataGridTextColumn Header="      Дата продажи" Binding="{Binding DateTimeSale, StringFormat='dd.MM.yyyy HH:mm'}" Width="140"/>
+                    <DataGridTextColumn Header="        Статус" Binding="{Binding SaleStatus}" Width="120"/>
+                    <DataGridTextColumn Header="   Стоимость" Binding="{Binding CoastSale, StringFormat={}{0} руб.}" Width="100"/>
+                    <DataGridTemplateColumn Header="                        Действия" Width="250">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <!-- Кнопка "Просмотреть" (переключает видимость) -->
-                                    <Button Content="Просмотреть" Command="{Binding DataContext.ViewSaleDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                <!-- Кнопка "Просмотреть" (переключает видимость) -->
+                                <Button Content="Просмотреть" Command="{Binding DataContext.ViewSaleDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                         CommandParameter="{Binding}" Style="{StaticResource MaterialDesignFlatButton}" Margin="5,0"/>
-
-                                    <!-- Кнопка "Удалить" -->
-                                    <Button Content="Удалить"
-                                            Command="{Binding DataContext.DeleteSaleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            CommandParameter="{Binding}"
-                                            Style="{StaticResource MaterialDesignFlatButton}" 
-                                            Margin="5,0"
-                                            Foreground="Red"
-                                            Visibility="{Binding TypeSale, Converter={StaticResource TypeSaleToVisibilityConverter}}"
-                                            IsEnabled="{Binding SaleStatus, Converter={StaticResource SaleStatusToIsEnabledConverter}}"/>
-                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
+
+            <Separator/>
 
             <!-- Контент с продуктами продажи -->
             <Border Background="{DynamicResource MaterialDesignPaper}" CornerRadius="5" Padding="10" Margin="0,10,0,0">

@@ -30,6 +30,7 @@ namespace App_Automatize_Backery.ViewModels
         public Visibility WorkerVisibility => IsWorker ? Visibility.Visible : Visibility.Collapsed;
         public Visibility AcceptButtonVisibility => IsWorker ? Visibility.Visible : Visibility.Collapsed;
 
+
         private MainViewModel _mainViewModel;
 
         private SupplyRequest _selectedRequest;
