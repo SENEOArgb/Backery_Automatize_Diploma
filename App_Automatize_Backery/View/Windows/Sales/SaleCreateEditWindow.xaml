@@ -46,7 +46,7 @@
         <ComboBox ItemsSource="{Binding SaleTypes}" 
                   SelectedItem="{Binding SelectedSaleType}"
                   Style="{StaticResource MaterialDesignComboBox}" 
-                  Grid.Column="1" Width="250" Margin="127,0,130,0" />
+                  Grid.Column="1" Width="250" Margin="127,4,130,0" Grid.RowSpan="2" VerticalAlignment="Top" />
 
         <!-- Дата продажи -->
         <TextBlock Text="Дата:" Grid.Row="1" VerticalAlignment="Center" />
@@ -58,9 +58,14 @@
         <!-- Время продажи -->
         <TextBlock Text="Время:" Grid.Row="2" VerticalAlignment="Center" />
         <materialDesign:TimePicker x:Name="selTime"
-                           SelectedTime="{Binding SelectedOrderTime, Mode=TwoWay, Converter={StaticResource TimeSpanToDateTimeConverter}}"
                            Style="{StaticResource MaterialDesignTimePicker}"
-                           Grid.Column="1" Grid.Row="2" Width="250" />
+                           Grid.Column="1" Grid.Row="2" Width="250">
+            <materialDesign:TimePicker.SelectedTime>
+                <Binding Path="SelectedOrderTime" Mode="TwoWay">
+                    <Binding.StringFormat>HH:mm</Binding.StringFormat>
+                </Binding>
+            </materialDesign:TimePicker.SelectedTime>
+        </materialDesign:TimePicker>
 
         <!-- Выбор продукта -->
         <TextBlock Text="Выбрать продукт:" Grid.Row="3" VerticalAlignment="Center" />
