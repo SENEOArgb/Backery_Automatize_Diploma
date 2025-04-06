@@ -22,7 +22,7 @@
 
                 <DataGrid ItemsSource="{Binding ProducedProducts}"
                       AutoGenerateColumns="False"
-                      IsReadOnly="True"
+                      IsReadOnly="True" CanUserResizeRows="False" CanUserResizeColumns="False"
                       materialDesign:DataGridAssist.CellPadding="8"
                       materialDesign:DataGridAssist.ColumnHeaderPadding="10"
                       RowHeaderWidth="0"

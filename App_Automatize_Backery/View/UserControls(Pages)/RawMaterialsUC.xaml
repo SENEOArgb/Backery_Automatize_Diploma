@@ -45,12 +45,13 @@
                           HeadersVisibility="Column"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
-                          CanUserResizeColumns="True"
+                          CanUserResizeColumns="False"
                           IsReadOnly="True"
                           Style="{StaticResource MaterialDesignDataGrid}"
                           SelectedItem="{Binding SelectedRawMaterial}"
                           RowHeaderWidth="0"
-                          Margin="0">
+                          Margin="0"
+                          CanUserResizeRows="False">
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Наименование" Binding="{Binding RawMaterialName}" Width="300" />

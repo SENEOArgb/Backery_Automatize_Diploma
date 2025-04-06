@@ -43,13 +43,14 @@
                               HeadersVisibility="Column"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
-                              CanUserResizeColumns="True"
+                              CanUserResizeColumns="False"
                               IsReadOnly="True"
                               Style="{StaticResource MaterialDesignDataGrid}"
                               SelectedItem="{Binding SelectedProduct}"
                               RowHeaderWidth="0"
                               Margin="0"
-                              MinHeight="100">
+                              MinHeight="100"
+                              CanUserResizeRows="False">
 
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Название" Binding="{Binding ProductName}" Width="300" />

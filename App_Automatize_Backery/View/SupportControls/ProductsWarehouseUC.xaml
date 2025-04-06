@@ -23,7 +23,8 @@
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   MaxHeight="500"
                   Background="{DynamicResource MaterialDesignPaper}"
-                  GridLinesVisibility="None">
+                  GridLinesVisibility="None"
+                  CanUserResizeRows="False" CanUserResizeColumns="False">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID Продукта" Binding="{Binding ProductId}"/>

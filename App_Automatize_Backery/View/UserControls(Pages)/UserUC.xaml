@@ -28,7 +28,7 @@
                 </Grid>
 
                 <Button Content="Задать норму" Command="{Binding SetDailyNormCommand}" Margin="0 50 0 0" Background="MidnightBlue" Width="140" 
-                        Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="White"/>
+                        Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="White" Visibility="{Binding ManagerMenuVisibility}"/>
                 <Separator Margin="0 50 0 0"/>
 
                 <TextBlock Text="Рабочий день: 8:00 - 21:00" Margin="0 30 0 0" FontSize="18"/>
