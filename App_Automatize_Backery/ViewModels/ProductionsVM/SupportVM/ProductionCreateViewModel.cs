@@ -224,7 +224,7 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
             var selectedRecipeModel = new SelectedRecipeModel
             {
                 Recipe = SelectedRecipe,
-                ProductCount = 1,
+                ProductCount = 0,
                 Ingredients = new ObservableCollection<RawMaterialMeasurementUnitRecipe>(ingredients)
             };
 

@@ -120,8 +120,8 @@ namespace App_Automatize_Backery.ViewModels
             {
                 try
                 {
-                    var rawMaterialsUC = new RawMaterialsUC();
-                    rawMaterialsUC.DataContext = new RMViewModel(); // Привязка ViewModel
+                    var rawMaterialsUC = new RawMaterialsUC(this);
+                    rawMaterialsUC.DataContext = new RMViewModel(this); // Привязка ViewModel
                     CurrentView = rawMaterialsUC;
                 }
                 catch (Exception ex)
@@ -148,8 +148,8 @@ namespace App_Automatize_Backery.ViewModels
             {
                 try
                 {
-                    var productsUC = new ProductsUC();
-                    productsUC.DataContext = new ProductsViewModel(); // Привязка ViewModel
+                    var productsUC = new ProductsUC(this);
+                    productsUC.DataContext = new ProductsViewModel(this); // Привязка ViewModel
                     CurrentView = productsUC;
                 }
                 catch (Exception ex)

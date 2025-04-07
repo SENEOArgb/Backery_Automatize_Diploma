@@ -7,56 +7,69 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:salesvm="clr-namespace:App_Automatize_Backery.ViewModels.SalesVM" d:DataContext="{d:DesignInstance Type=salesvm:SalesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <StackPanel Margin="10">
-            <!-- Заголовок -->
-            <TextBlock Text="Список записей продаж:" FontSize="24" FontWeight="Bold" 
-                       Foreground="{DynamicResource PrimaryHueMidBrush}" 
-                       Margin="450,0,0,10"/>
+    <Grid Background="{DynamicResource MaterialDesignPaper}" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-            <!-- Кнопка создания -->
-            <Button Command="{Binding CreateSaleCommand}" Width="200"
-                    Style="{StaticResource MaterialDesignRaisedButton}" Height="40" Margin="0,20,0,10">
+        <!-- Заголовок и кнопка -->
+        <DockPanel Margin="0,0,0,16">
+            <TextBlock Text="Список продаж:" 
+                       FontSize="28" 
+                       FontWeight="Bold" 
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" 
+                       Margin="480 0 0 0"/>
+            <Button
+                    Command="{Binding CreateSaleCommand}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Margin="250,0,0,0" Width="250"
+                    VerticalAlignment="Center"
+                    Padding="12,6"
+                    DockPanel.Dock="Right">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
-                    <TextBlock Text="Создать" FontWeight="SemiBold"/>
+                    <TextBlock Text="Оформить продажу" FontWeight="SemiBold"/>
                 </StackPanel>
             </Button>
+        </DockPanel>
 
-            <!-- Таблица с продажами -->
-            <DataGrid ItemsSource="{Binding Sales}" SelectedItem="{Binding SelectedSale}" Margin="0 50 0 0"
-                      AutoGenerateColumns="False" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      RowHeight="40" GridLinesVisibility="None" MaxHeight="200" Height="200" CanUserResizeRows="False" CanUserResizeColumns="False"
-                      SelectionMode="Single" AlternatingRowBackground="{DynamicResource MaterialDesignPaper}">
-                <DataGrid.ColumnHeaderStyle>
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
-                        <Setter Property="FontWeight" Value="Bold" />
-                    </Style>
-                </DataGrid.ColumnHeaderStyle>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="      Тип продажи" Binding="{Binding TypeSale}" Width="130"/>
-                    <DataGridTextColumn Header="      Дата продажи" Binding="{Binding DateTimeSale, StringFormat='dd.MM.yyyy HH:mm'}" Width="140"/>
-                    <DataGridTextColumn Header="        Статус" Binding="{Binding SaleStatus}" Width="120"/>
-                    <DataGridTextColumn Header="   Стоимость" Binding="{Binding CoastSale, StringFormat={}{0} руб.}" Width="100"/>
-                    <DataGridTemplateColumn Header="                        Действия" Width="250">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <!-- Кнопка "Просмотреть" (переключает видимость) -->
-                                <Button Content="Просмотреть" Command="{Binding DataContext.ViewSaleDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                        CommandParameter="{Binding}" Style="{StaticResource MaterialDesignFlatButton}" Margin="5,0"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+        <!-- Таблица продаж -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Sales}"
+                  SelectedItem="{Binding SelectedSale}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  RowHeaderWidth="0"
+                  Margin="0,0,0,10"
+                  materialDesign:DataGridAssist.CellPadding="8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="10"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  Style="{StaticResource MaterialDesignDataGrid}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Тип продажи" Binding="{Binding TypeSale}" Width="300" />
+                <DataGridTextColumn Header="Дата" Binding="{Binding DateTimeSale, StringFormat='dd.MM.yyyy HH:mm'}" Width="300" />
+                <DataGridTextColumn Header="Статус" Binding="{Binding SaleStatus}" Width="150" />
+                <DataGridTextColumn Header="Сумма" Binding="{Binding CoastSale, StringFormat={}{0} руб.}" Width="100" />
+                <DataGridTemplateColumn Header="                                       Действия" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Просмотреть"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Command="{Binding DataContext.ViewSaleDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
-            <Separator/>
-
-            <!-- Контент с продуктами продажи -->
-            <Border Background="{DynamicResource MaterialDesignPaper}" CornerRadius="5" Padding="10" Margin="0,10,0,0">
-                <ContentControl Content="{Binding SelectedSaleDetails}" />
-            </Border>
-        </StackPanel>
+        <!-- Контейнер для деталей продажи -->
+        <ContentControl Grid.Row="2"
+                        Content="{Binding SelectedSaleDetails}"
+                        Margin="0"
+                        VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

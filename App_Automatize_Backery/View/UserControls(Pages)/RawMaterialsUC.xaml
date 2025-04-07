@@ -28,10 +28,10 @@
                                DockPanel.Dock="Left"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
-                        <Button Command="{Binding CreateCommand}" Style="{StaticResource MaterialDesignFlatButton}">
+                        <Button Command="{Binding CreateCommand}" Style="{StaticResource MaterialDesignFlatButton}" Visibility="{Binding TechnologistVisibility}">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
-                                <TextBlock Text="Создать" FontWeight="SemiBold"/>
+                                <TextBlock Text="Создать номенклатуру" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -60,10 +60,10 @@
                         <DataGridTextColumn Header="Ед. измерения" Binding="{Binding MeasurementUnit.MeasurementUnitName}" Width="150" />
 
                         <!-- Кнопка Редактировать -->
-                        <DataGridTemplateColumn Header="      Действия" Width="200">
+                        <DataGridTemplateColumn Header="" Width="200">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" >
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding DataContext.TechnologistVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                         <Button Style="{StaticResource MaterialDesignToolButton}"
                                             ToolTip="Редактировать" Margin="0 0 0 0 "
                                             Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"

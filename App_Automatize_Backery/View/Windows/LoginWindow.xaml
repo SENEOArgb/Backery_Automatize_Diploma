@@ -5,17 +5,68 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:App_Automatize_Backery.View" xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels"
         mc:Ignorable="d"
-        Title="LoginWindow" Height="450" Width="800">
+        Title="Авторизация" Height="400" Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#f5f5f5">
     <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
-            <!-- Привязка логина -->
-            <TextBox Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" />
+        <Border Margin="20"
+            CornerRadius="15"
+            Background="White"
+            Padding="30">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+                <!-- Заголовок -->
+                <TextBlock Text="Вход в систему"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="#2c3e50"
+                       HorizontalAlignment="Center"
+                       Margin="0 0 0 30" />
 
-            <!-- Привязка пароля через PasswordChanged -->
-            <PasswordBox Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" />
+                <!-- Логин -->
+                <TextBlock Text="Логин"
+                       Margin="0 0 0 5"
+                       FontWeight="SemiBold"
+                       Foreground="#34495e"/>
+                <TextBox Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}"
+                     Height="35"
+                     Margin="0 0 0 20"
+                     Padding="10 0 0 0"
+                     FontSize="14"
+                     Background="#ecf0f1"
+                     BorderBrush="#bdc3c7"
+                     BorderThickness="1"
+                     />
 
-            <!-- Кнопка входа -->
-            <Button Content="Войти" Command="{Binding LoginCommand}" />
-        </StackPanel>
+                <!-- Пароль -->
+                <TextBlock Text="Пароль"
+                       Margin="0 0 0 5"
+                       FontWeight="SemiBold"
+                       Foreground="#34495e"/>
+                <PasswordBox Name="PasswordBox"
+                         PasswordChanged="PasswordBox_PasswordChanged"
+                         Height="35"
+                         Margin="0 0 0 30"
+                         Padding="10 0 0 0"
+                         FontSize="14"
+                         Background="#ecf0f1"
+                         BorderBrush="#bdc3c7"
+                         BorderThickness="1"
+                         />
+
+                <!-- Кнопка Войти -->
+                <Button Content="Войти"
+                    Height="40"
+                    Background="#3498db"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    FontSize="16"
+                    BorderBrush="#2980b9"
+                    BorderThickness="1"
+                    Command="{Binding LoginCommand}"
+                    Cursor="Hand"
+                    />
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

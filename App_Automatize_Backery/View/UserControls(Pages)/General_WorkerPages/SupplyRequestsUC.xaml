@@ -9,70 +9,87 @@
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1200"             Background="{DynamicResource MaterialDesignPaper}">
 
-    <Grid>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок и кнопка создания заявки -->
-        <StackPanel Grid.Row="0" Margin="20">
-            <TextBlock HorizontalAlignment="Center" Text="Список заявок" FontSize="24" FontWeight="Bold" Margin="10,-50,0,10"/>
-            <Button Command="{Binding CreateSupplyRequestCommand}" 
-                    Visibility="{Binding ManagerVisibility}" HorizontalAlignment="Center" 
-                    VerticalAlignment="Top" Margin="10,0,5,10" Height="35"
-                    Style="{StaticResource MaterialDesignFlatButton}">
+        <!-- Заголовок -->
+        <DockPanel Grid.Row="0" Margin="470,0,0,16">
+            <TextBlock Text="Заявки на поставку:"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" />
+            <Button
+                    Command="{Binding CreateSupplyRequestCommand}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Margin="170,0,0,0" Width="180"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"
+                    Padding="12,6"
+                    Visibility="{Binding ManagerVisibility}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
-                    <TextBlock Text="Создать" FontWeight="SemiBold"/>
+                    <TextBlock Text="Создать заявку" FontWeight="SemiBold"/>
                 </StackPanel>
             </Button>
+        </DockPanel>
 
-            <!-- Таблица заявок -->
-            <DataGrid x:Name="supplyRequest" Height="300" ItemsSource="{Binding SupplyRequests}" 
-                      SelectedItem="{Binding SelectedRequest, Mode=TwoWay}" CanUserResizeRows="False" CanUserResizeColumns="False"
-                      AutoGenerateColumns="False" IsReadOnly="True" MaxHeight="350"
-                      Style="{StaticResource MaterialDesignDataGrid}" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Дата" Binding="{Binding SupplyRequestDate, StringFormat='dd.MM.yyyy HH:mm'}" Width="Auto"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Status.StatusName}" Width="Auto"/>
-                    <DataGridTextColumn Header="Цена" Binding="{Binding TotalSalary, StringFormat={}{0} руб.}" Width="Auto"/>
+        <!-- Таблица заявок -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding SupplyRequests}"
+                  SelectedItem="{Binding SelectedRequest, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Style="{StaticResource MaterialDesignDataGrid}"
+                  RowHeight="45" MaxHeight="300"
+                  Margin="0,5,0,10"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Дата"
+                                    Binding="{Binding SupplyRequestDate, StringFormat='dd.MM.yyyy'}"
+                                    Width="*" />
+                <DataGridTextColumn Header="Статус"
+                                    Binding="{Binding Status.StatusName}"
+                                    Width="*" />
+                <DataGridTextColumn Header="Сумма"
+                                    Binding="{Binding TotalSalary, StringFormat={}{0} руб.}"
+                                    Width="*" />
 
-                    <!-- Кнопка "Просмотреть" -->
-                    <DataGridTemplateColumn Header="                                Действия" Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Width="Auto" Orientation="Horizontal">
-                                    <Button Content="Просмотреть" 
-                                        Command="{Binding DataContext.ViewSupplyRequestMaterialsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                <DataGridTemplateColumn Header="" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Button Content="Просмотреть"
+                                        Command="{Binding DataContext.ViewSupplyRequestMaterialsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}" 
-                                        Background="DarkBlue" 
-                                        Foreground="White" Padding="5" />
-                                    <Button Content="Редактировать"
-                                        Command="{Binding DataContext.EditSupplyRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}" Margin="40 0 0 0"
-                                        Background="Orange" Foreground="White" Padding="5"
-                                        Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                                    <Button Content="Отменить" 
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+
+                                <Button Content="Отменить"
                                         Command="{Binding DataContext.DeleteSupplyRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}" Margin="40 0 0 0"
-                                        Background="Red" Foreground="White" Padding="5"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Foreground="Red"
                                         Visibility="{Binding DataContext.ManagerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                                    <Button Content="Принять" 
+
+                                <Button Content="Принять"
                                         Command="{Binding DataContext.AcceptRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}" Margin="40 0 0 0"
-                                        Visibility="{Binding DataContext.AcceptButtonVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                        IsEnabled="{Binding StatusId, Converter={StaticResource StatusToEnabledConverter}}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </StackPanel>
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Visibility="{Binding DataContext.AcceptButtonVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        IsEnabled="{Binding StatusId, Converter={StaticResource StatusToEnabledConverter}}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Separator Margin="0 0 0 -700"/>
 
-        <Separator Margin="0 420 0 0"/>
-
-        <ContentControl Content="{Binding CurrentContent}" Margin="0,0,20,0" Grid.Row="1"/>
+        <!-- Контент с деталями (сырье) -->
+        <ContentControl Grid.Row="2" Content="{Binding CurrentContent}" Margin="0,20,0,10"/>
     </Grid>
 </UserControl>

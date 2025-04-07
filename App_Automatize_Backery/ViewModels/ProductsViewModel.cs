@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace App_Automatize_Backery.ViewModels
@@ -35,8 +36,21 @@ namespace App_Automatize_Backery.ViewModels
         public ICommand EditProductCommand { get; }
         public ICommand DeleteProductCommand { get; }
 
-        public ProductsViewModel()
+        public MainViewModel _vmMain;
+
+        public bool IsManager => _vmMain.CurrentUser?.UserRoleId == 2;  // Зав. производством
+        public bool IsWorker => _vmMain.CurrentUser?.UserRoleId == 3;   // Сотрудник на производстве
+
+        public bool IsTechnolog => _vmMain.CurrentUser?.UserRoleId == 1;
+
+        // Свойство для скрытия кнопки меню, если нет доступа
+        public Visibility ManagerMenuVisibility => IsManager ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility WorkerMenuVisibility => IsWorker ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility TechnologistVisibility => IsTechnolog ? Visibility.Visible : Visibility.Hidden;
+
+        public ProductsViewModel(MainViewModel mainViewModel)
         {
+            _vmMain = mainViewModel;
             LoadProducts();
             CreateProductCommand = new RelayCommand(_ => OpenCreateEditWindow(null));
             EditProductCommand = new RelayCommand(_ => OpenCreateEditWindow(SelectedProduct), _ => SelectedProduct != null);

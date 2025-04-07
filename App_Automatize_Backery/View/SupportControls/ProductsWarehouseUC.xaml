@@ -27,10 +27,9 @@
                   CanUserResizeRows="False" CanUserResizeColumns="False">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID Продукта" Binding="{Binding ProductId}"/>
-                <DataGridTextColumn Header="Название" Binding="{Binding Product.ProductName}"/>
-                <DataGridTextColumn Header="Количество, шт" Binding="{Binding RawMaterialCount}"/>
-                <DataGridTextColumn Header="Произведено" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Product.ProductName}" Width="*"/>
+                <DataGridTextColumn Header="Количество, шт" Binding="{Binding RawMaterialCount}" Width="*"/>
+                <DataGridTextColumn Header="Произведено" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

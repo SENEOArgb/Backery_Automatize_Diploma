@@ -21,10 +21,10 @@ namespace App_Automatize_Backery.View.UserControls_Pages_
     /// </summary>
     public partial class RawMaterialsUC : UserControl
     {
-        public RawMaterialsUC()
+        public RawMaterialsUC(MainViewModel mainViewModel)
         {
             InitializeComponent();
-            this.DataContext = new RMViewModel();
+            this.DataContext = new RMViewModel(mainViewModel);
         }
     }
 }

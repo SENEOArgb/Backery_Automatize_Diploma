@@ -9,10 +9,8 @@
         Background="{DynamicResource MaterialDesignPaper}" WindowStartupLocation="CenterScreen"
         Title="Панель управления мини-пекарней" Height="800" Width="1280" Style="{StaticResource MaterialDesignWindow}" >
     <Window.Resources>
-        <!-- Стилизация затемняющего слоя -->
         <SolidColorBrush x:Key="DarkOverlayBrush" Color="#80000000"/>
 
-        <!-- Анимация открытия меню -->
         <Storyboard x:Key="DrawerOpenStoryboard">
             <DoubleAnimation Storyboard.TargetName="Drawer"
                              Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
@@ -21,8 +19,6 @@
                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                             From="Transparent" To="#80000000" Duration="0:0:0.5" />
         </Storyboard>
-
-        <!-- Анимация закрытия меню -->
         <Storyboard x:Key="DrawerCloseStoryboard">
             <DoubleAnimation Storyboard.TargetName="Drawer"
                              Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
@@ -34,11 +30,9 @@
     </Window.Resources>
 
     <Grid>
-        <!-- Затемняющий слой -->
         <Border x:Name="Overlay" Background="Transparent" Visibility="Collapsed" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                 Panel.ZIndex="2"/>
 
-        <!-- Боковое меню -->
         <Grid x:Name="Drawer" Width="250" Background="DimGray" Opacity="0.70" HorizontalAlignment="Left" VerticalAlignment="Top"
               Panel.ZIndex="3" >
             <Grid.RenderTransform>
@@ -61,7 +55,7 @@
                 <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductsCommand}" Visibility="{Binding ProductsVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Food" Margin="0,0,10,0"/>
-                        <TextBlock Text="Продукты"/>
+                        <TextBlock Text="Изделия"/>
                     </StackPanel>
                 </Button>
                 <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductionCommand}" Visibility="{Binding ProductionVisibility}">
@@ -91,9 +85,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- Основной контент -->
         <Grid Panel.ZIndex="3">
-            <!-- Кнопка меню -->
             <Button Content="☰" ToolTip="Меню" Width="48" Height="48" Margin="10" 
             Style="{StaticResource MaterialDesignToolButton}" 
             Click="ToggleMenuButton_Click" Panel.ZIndex="3"
@@ -101,7 +93,6 @@
             Background="{DynamicResource PrimaryHueMidBrush}" 
             Foreground="Black"/>
 
-            <!-- Заголовок -->
             <TextBlock Text="Панель управления" FontSize="22" FontWeight="Bold" Margin="70,20,0,0"
                VerticalAlignment="Top" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
         </Grid>

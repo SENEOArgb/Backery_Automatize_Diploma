@@ -21,10 +21,10 @@ namespace App_Automatize_Backery.View.UserControls_Pages_
     /// </summary>
     public partial class ProductsUC : UserControl
     {
-        public ProductsUC()
+        public ProductsUC(MainViewModel mainViewModel)
         {
             InitializeComponent();
-            this.DataContext = new ProductsViewModel();
+            this.DataContext = new ProductsViewModel(mainViewModel);
         }
     }
 }

@@ -13,7 +13,7 @@
             Margin="0,10,0,0"
             materialDesign:ShadowAssist.Darken="True">
             <StackPanel>
-                <DockPanel Margin="0,0,0,12">
+                <DockPanel Margin="470,0,0,12">
                     <TextBlock Text="Детали производства:"
                            FontSize="22"
                            FontWeight="Bold"

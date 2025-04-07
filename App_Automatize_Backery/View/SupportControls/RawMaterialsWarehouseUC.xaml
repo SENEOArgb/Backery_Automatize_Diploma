@@ -25,10 +25,9 @@
                   GridLinesVisibility="None"
                   CanUserResizeRows="False" CanUserResizeColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID Сырья" Binding="{Binding RawMaterialId}"/>
-                <DataGridTextColumn Header="Название" Binding="{Binding RawMaterial.RawMaterialName}"/>
-                <DataGridTextColumn Header="Количество, кг/л" Binding="{Binding RawMaterialCount}"/>
-                <DataGridTextColumn Header="Поступление" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding RawMaterial.RawMaterialName}" Width="*"/>
+                <DataGridTextColumn Header="Количество, кг/л" Binding="{Binding RawMaterialCount, StringFormat={}{0:0.##}}"  Width="*"/>
+                <DataGridTextColumn Header="Поступление" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

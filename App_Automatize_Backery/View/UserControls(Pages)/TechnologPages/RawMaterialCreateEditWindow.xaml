@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Title="RawMaterialCreateEditWindow" Height="400" Width="400">
+        Title="RawMaterialCreateEditWindow" Height="450" Width="400">
     <Grid>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
 
@@ -28,7 +28,7 @@
                       DisplayMemberPath="MeasurementUnitName"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Сохранить" Command="{Binding SaveCommand}" Width="100" Margin="5"/>
+                <Button Content="Сохранить" Command="{Binding SaveCommand}" Width="120" Margin="5"/>
                 <Button Content="Отмена" Command="{Binding CancelCommand}" Width="100" Margin="5"/>
             </StackPanel>
 

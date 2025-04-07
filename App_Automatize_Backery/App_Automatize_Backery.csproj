@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\RecipesVM\" />
     <Folder Include="View\UserControls%28Pages%29\GeneralManufacturyPages\" />
   </ItemGroup>
 

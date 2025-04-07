@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:App_Automatize_Backery.View.Windows.Productions" xmlns:supportvm="clr-namespace:App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM" d:DataContext="{d:DesignInstance Type=supportvm:ProductionCreateViewModel}"
+        xmlns:local="clr-namespace:App_Automatize_Backery.View.Windows.Productions" xmlns:supportvm="clr-namespace:App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" d:DataContext="{d:DesignInstance Type=supportvm:ProductionCreateViewModel}"
         mc:Ignorable="d"
         Title="ProductionCreateEditWindow" Height="450" Width="800">
     <Grid Margin="20">
@@ -50,8 +50,10 @@
                 <DataGridTemplateColumn Header="Удалить">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="Удалить" Command="{Binding DataContext.RemoveRecipeCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Width="30"
-                                    IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBoolConverter}}"/>
+                            <Button Command="{Binding DataContext.RemoveRecipeCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Width="50"
+                                    IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBoolConverter}}">
+                                <materialDesign:PackIcon Kind="Delete" Width="20" Height="20"/>
+                            </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

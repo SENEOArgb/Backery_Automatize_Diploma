@@ -15,6 +15,9 @@ using App_Automatize_Backery.View.Windows.Productions;
 using App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM;
 using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media.Animation;
 
 namespace App_Automatize_Backery.ViewModels.SalesVM
 {
@@ -41,6 +44,7 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
         public ObservableCollection<Product> Products { get; set; }
         public ObservableCollection<string> SaleTypes { get; } = new() { "Заказ", "Прямая продажа" };
 
+
         public string SelectedSaleType
         {
             get => _selectedSaleType;
@@ -51,11 +55,11 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
 
                 if (_selectedSaleType == "Прямая продажа")
                 {
-                    SelectedOrderDate = DateTime.Now.Date;
-                    SelectedOrderTime = DateTime.Now.TimeOfDay;
+
                 }
             }
         }
+
 
         public Product SelectedProduct
         {
@@ -77,13 +81,14 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             }
         }
 
+
         public DateTime SelectedOrderDate
         {
             get => _selectedOrderDate;
             set
             {
                 _selectedOrderDate = value;
-                Sale.DateTimeSale = _selectedOrderDate.Date + _selectedOrderTime;
+                UpdateDateTimeSale();
                 OnPropertyChanged(nameof(SelectedOrderDate));
             }
         }
@@ -94,7 +99,7 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             set
             {
                 _selectedOrderTime = value;
-                Sale.DateTimeSale = _selectedOrderDate.Date + _selectedOrderTime;
+                UpdateDateTimeSale();
                 OnPropertyChanged(nameof(SelectedOrderTime));
             }
         }
@@ -121,9 +126,21 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             vmMain = mainViewModel;
 
             Sale = sale ?? new Sale();
-            SelectedSaleType = Sale.TypeSale ?? "Прямая продажа";
-            SelectedOrderDate = Sale.DateTimeSale.Date;
-            SelectedOrderTime = Sale.DateTimeSale.TimeOfDay;
+
+            SelectedSaleType = Sale.TypeSale;
+
+            // если дата/время в Sale заданы, берём их; иначе — по умолчанию
+            if (Sale.DateTimeSale != default)
+            {
+                SelectedOrderDate = Sale.DateTimeSale.Date;
+                SelectedOrderTime = Sale.DateTimeSale.TimeOfDay;
+            }
+            else
+            {
+                SelectedOrderDate = DateTime.Now.Date;
+                SelectedOrderTime = DateTime.Now.TimeOfDay;
+            }
+
 
             Products = new ObservableCollection<Product>(_context.Products.AsNoTracking().ToList());
             SelectedProduct = _context.Products.FirstOrDefault();
@@ -396,13 +413,12 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             };
 
             var result = wnProduction.ShowDialog();
-            if(result == true)
+            if (result == true)
             {
                 await UpdateSaleTaskAsync(freshSale);
             }
             return result == true;
         }
-
 
 
         public async void SaveSale()
@@ -421,15 +437,12 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                     return;
                 }
 
-                if (_saleCancellationTokens.TryGetValue(Sale?.SaleId ?? 0, out var existingTokenSource))
-                {
-                    existingTokenSource.Cancel();
-                    _saleCancellationTokens.Remove(Sale.SaleId);
-                }
 
-                SetSaleTypeAndDateTime();
                 Sale.UserId = vmMain.CurrentUser.UserId;
                 Sale.SaleStatus = SelectedSaleType == "Прямая продажа" ? "Завершена" : "В процессе";
+                SetSaleTypeAndDateTime();
+
+                Sale.TypeSale = SelectedSaleType;
 
                 if (Sale.DateTimeSale.TimeOfDay >= new TimeSpan(19, 0, 0))
                 {
@@ -438,21 +451,22 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                     Sale.CoastSale = TotalCost;
                 }
 
+                await _context.Sales.AddAsync(Sale);
+                await _context.SaveChangesAsync();
+
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
-                        bool isNewSale = Sale.SaleId == 0;
+                        //bool isNewSale = Sale.SaleId == 0;
 
-                        if (!isNewSale)
+                       /* if (!isNewSale)
                             await RestoreStockFromPreviousSale(Sale.SaleId);
 
                         if (isNewSale)
                             _context.Sales.Add(Sale);
                         else
-                            _context.Sales.Update(Sale);
-
-                        await _context.SaveChangesAsync();
+                            _context.Sales.Update(Sale);*/
 
                         foreach (var saleProduct in SaleProducts)
                         {
@@ -494,23 +508,12 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                             MessageBox.Show("Создание производства было отменено. Продажа сохранена, но производство не запущено.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
-                    closeWindow = true;
-                }
-                else if (SelectedSaleType == "Прямая продажа")
-                {
-                    await ProcessImmediateSaleAsync();
-                    closeWindow = true;
-                }
-
-                if (closeWindow == true)
-                {
-                    CloseWindow(true);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка: {ex.Message}\n\n{ex.InnerException?.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                Debug.WriteLine($"[ERROR] Ошибка SaveSale: {ex}");
+                MessageBox.Show($"Ошибка при сохранении продажи: {ex.Message}\n\n{ex.InnerException?.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine($"[ERROR] Ошибка при сохранении продажи: {ex}");
             }
         }
 
@@ -518,15 +521,28 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
         {
             Sale.TypeSale = SelectedSaleType;
 
-            if (SelectedSaleType == "Прямая продажа")
+            Debug.WriteLine($"SelectedOrderDate: {SelectedOrderDate}, SelectedOrderTime: {SelectedOrderTime}");
+            if (SelectedSaleType == "Заказ")
             {
-                Sale.DateTimeSale = DateTime.Now;
+                if (SelectedOrderDate != null && SelectedOrderTime != null)
+                {
+                    Debug.WriteLine($"SelectedOrderDate: {SelectedOrderDate}, SelectedOrderTime: {SelectedOrderTime}");
+                    Sale.DateTimeSale = SelectedOrderDate.Date.Add(SelectedOrderTime);
+                    Debug.WriteLine($"Final Sale DateTimeSale: {Sale.DateTimeSale}");
+                }
+                else
+                {
+                    MessageBox.Show("Пожалуйста, выберите корректную дату и время для заказа.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                // Если "Прямая продажа", используем текущую дату и время
             }
             else
             {
-                // Здесь комбинируем дату и время в одном объекте DateTime
-                Sale.DateTimeSale = SelectedOrderDate.Add(SelectedOrderTime);
+                // Если другой тип продажи (например, "Заказ"), используем выбранные пользователем дату и время
+                Sale.DateTimeSale = DateTime.Now;
             }
+            Debug.WriteLine($"Final Sale DateTimeSale: {Sale.DateTimeSale}");
         }
 
         private async Task ProcessImmediateSaleAsync()
@@ -661,6 +677,64 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             }
         }
 
+        private bool Validate()
+        {
+            // Проверка пользователя
+            if (vmMain?.CurrentUser == null)
+            {
+                MessageBox.Show("Пользователь не авторизован.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            // Проверка продуктов
+            if (SaleProducts == null || SaleProducts.Count == 0)
+            {
+                MessageBox.Show("Добавьте хотя бы один продукт в продажу.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            if (SaleProducts.Any(p => p.CountProductSale <= 0))
+            {
+                MessageBox.Show("У одного или нескольких продуктов указано неверное количество.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            // Проверка типа продажи
+            if (string.IsNullOrWhiteSpace(SelectedSaleType))
+            {
+                MessageBox.Show("Выберите тип продажи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            //SetSaleTypeAndDateTime(); // Установим актуальную дату и время из Selected*
+
+/*            if (SelectedSaleType == "Прямая продажа")
+            {
+                // Нельзя в будущем
+                if (Sale.DateTimeSale > DateTime.Now)
+                {
+                    MessageBox.Show("Нельзя установить время в будущем для прямой продажи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+            }
+            else if (SelectedSaleType == "Заказ")
+            {
+                if (Sale.DateTimeSale <= DateTime.Now)
+                {
+                    MessageBox.Show("Время заказа должно быть в будущем.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                if ((Sale.DateTimeSale - DateTime.Now).TotalDays > 2)
+                {
+                    MessageBox.Show("Заказ нельзя установить позже, чем через 2 дня.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+            }*/
+
+            return true;
+        }
+
         private void CloseWindow(bool dialogResult)
         {
             foreach (Window window in Application.Current.Windows)
@@ -672,6 +746,20 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                     break;
                 }
             }
+        }
+
+        private void UpdateDateTimeSale()
+        {
+            if (SelectedSaleType == "Прямая продажа")
+            {
+                Sale.DateTimeSale = DateTime.Now;
+            }
+            else if (SelectedSaleType == "Заказ")
+            {
+                Sale.DateTimeSale = SelectedOrderDate.Date + SelectedOrderTime;
+            }
+
+            Debug.WriteLine($"[DEBUG] Sale.DateTimeSale: {Sale.DateTimeSale}");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

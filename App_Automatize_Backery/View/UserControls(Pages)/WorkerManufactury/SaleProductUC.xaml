@@ -8,23 +8,34 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <StackPanel Margin="10">
-            <!-- Заголовок -->
-            <TextBlock Text="Продукты в продаже:" FontSize="22" FontWeight="Bold"
-                       Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="470,0,0,10"/>
+        <Border Background="{DynamicResource MaterialDesignCardBackground}" 
+            CornerRadius="10" 
+            Padding="16" 
+            Margin="0,0,0,10" 
+            materialDesign:ShadowAssist.Darken="True">
+            <StackPanel>
+                <!-- Заголовок -->
+                <TextBlock Text="Продукты в продаже" 
+                       FontSize="22" 
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}"
+                       Margin="0,0,0,12"/>
 
-            <!-- Таблица продуктов -->
-            <DataGrid ItemsSource="{Binding SaleProducts}" SelectedItem="{Binding SelectedSaleProduct}"
-                      AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40"
-                      SelectionMode="Single" CanUserResizeRows="False" CanUserResizeColumns="False"
-                      AlternatingRowBackground="{DynamicResource MaterialDesignPaper}">
-
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Продукт" Binding="{Binding Product.ProductName}" Width="200"/>
-                    <DataGridTextColumn Header="Количество,шт" Binding="{Binding CountProductSale}" Width="150"/>
-                    <DataGridTextColumn Header="Стоимость" Binding="{Binding CoastToProduct, StringFormat={}{0} руб.}" Width="100"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </StackPanel>
+                <!-- Таблица продуктов -->
+                <DataGrid ItemsSource="{Binding SaleProducts}"
+                      SelectedItem="{Binding SelectedSaleProduct}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      RowHeaderWidth="0"
+                      materialDesign:DataGridAssist.CellPadding="8"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="10"
+                      Style="{StaticResource MaterialDesignDataGrid}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Продукт" Binding="{Binding Product.ProductName}" Width="*" />
+                        <DataGridTextColumn Header="Количество" Binding="{Binding CountProductSale}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

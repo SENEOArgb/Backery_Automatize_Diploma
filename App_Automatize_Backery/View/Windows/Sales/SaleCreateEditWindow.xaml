@@ -16,16 +16,23 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Заголовок -->
             <RowDefinition Height="Auto"/>
+            <!-- Тип продажи -->
             <RowDefinition Height="Auto"/>
+            <!-- Дата -->
             <RowDefinition Height="Auto"/>
+            <!-- Время -->
             <RowDefinition Height="Auto"/>
+            <!-- Продукт -->
+            <RowDefinition Height="Auto"/>
+            <!-- Кол-во -->
             <RowDefinition Height="10"/>
-            <!-- Отступ перед DataGrid -->
+            <!-- Отступ -->
             <RowDefinition Height="*"/>
-            <!-- Список продуктов -->
+            <!-- Таблица -->
             <RowDefinition Height="Auto"/>
-            <!-- Итоговая стоимость -->
+            <!-- Итог -->
             <RowDefinition Height="Auto"/>
             <!-- Кнопки -->
         </Grid.RowDefinitions>
@@ -36,55 +43,60 @@
         </Grid.ColumnDefinitions>
 
         <!-- Заголовок -->
-        <TextBlock Text="Создание / Редактирование продажи" 
-                   FontSize="22" FontWeight="Bold" VerticalAlignment="Top"
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                   Text="Создание / Редактирование продажи"
+                   FontSize="22" FontWeight="Bold" 
                    Foreground="{DynamicResource PrimaryHueMidBrush}" 
-                   Grid.ColumnSpan="2" Margin="-10,-24,10,0"/>
+                   Margin="-10,-24,10,10"/>
 
         <!-- Тип продажи -->
-        <TextBlock Text="Тип продажи:" VerticalAlignment="Top" Margin="0,9,0,0"/>
-        <ComboBox ItemsSource="{Binding SaleTypes}" 
-                  SelectedItem="{Binding SelectedSaleType}"
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Тип продажи:" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="1" Grid.Column="1"
+                  ItemsSource="{Binding SaleTypes}" 
+                  SelectedItem="{Binding SelectedSaleType, UpdateSourceTrigger=PropertyChanged}"
                   Style="{StaticResource MaterialDesignComboBox}" 
-                  Grid.Column="1" Width="250" Margin="127,4,130,0" Grid.RowSpan="2" VerticalAlignment="Top" />
+                  Width="250" Margin="0,5"/>
 
         <!-- Дата продажи -->
-        <TextBlock Text="Дата:" Grid.Row="1" VerticalAlignment="Center" />
-        <DatePicker x:Name="selDate" 
-            SelectedDate="{Binding SelectedOrderDate, Mode=TwoWay}" 
-            Style="{StaticResource MaterialDesignDatePicker}" 
-            Grid.Column="1" Grid.Row="1" Width="250" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Дата:" VerticalAlignment="Center"/>
+        <DatePicker x:Name="DatePickerControl" Grid.Row="2" Grid.Column="1"
+                    SelectedDate="{Binding SelectedOrderDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                    Style="{StaticResource MaterialDesignDatePicker}" 
+                    Width="250" Margin="0,5"/>
 
         <!-- Время продажи -->
-        <TextBlock Text="Время:" Grid.Row="2" VerticalAlignment="Center" />
-        <materialDesign:TimePicker Is24Hours="True" x:Name="selTime"
-                           Style="{StaticResource MaterialDesignTimePicker}"
-                           Grid.Column="1" Grid.Row="2" Width="250">
-            <materialDesign:TimePicker.SelectedTime>
-                <Binding Path="SelectedOrderTime" Mode="TwoWay">
-                    <Binding.StringFormat>HH:mm</Binding.StringFormat>
-                </Binding>
-            </materialDesign:TimePicker.SelectedTime>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Время:" VerticalAlignment="Center"/>
+        <materialDesign:TimePicker Grid.Row="3" Grid.Column="1"
+                                   Is24Hours="True" SelectedTime="{Binding SelectedOrderTime, Mode=TwoWay, StringFormat='HH:mm', 
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                   Style="{StaticResource MaterialDesignTimePicker}"
+                                   Width="250" Margin="0,5"
+                                   x:Name="selTime">
         </materialDesign:TimePicker>
 
         <!-- Выбор продукта -->
-        <TextBlock Text="Выбрать продукт:" Grid.Row="3" VerticalAlignment="Center" />
-        <ComboBox ItemsSource="{Binding Products}" 
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Выбрать продукт:" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="4" Grid.Column="1"
+                  ItemsSource="{Binding Products}" 
                   DisplayMemberPath="ProductName"
                   SelectedItem="{Binding SelectedProduct}"
                   Style="{StaticResource MaterialDesignComboBox}"
-                  Grid.Column="1" Grid.Row="3" Width="250" />
+                  Width="250" Margin="0,5"/>
 
         <!-- Количество -->
-        <TextBlock Text="Количество:" Grid.Row="4" VerticalAlignment="Center" />
-        <TextBox Text="{Binding SelectedProductQuantity, UpdateSourceTrigger=PropertyChanged}"
-                 Grid.Column="1" Grid.Row="4" 
-                 Style="{StaticResource MaterialDesignTextBox}" Width="250" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Количество:" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="5" Grid.Column="1"
+                 Text="{Binding SelectedProductQuantity, UpdateSourceTrigger=PropertyChanged}"
+                 Style="{StaticResource MaterialDesignTextBox}" 
+                 Width="250" Margin="0,5"/>
 
         <!-- Таблица продуктов -->
-        <DataGrid ItemsSource="{Binding SaleProducts}" AutoGenerateColumns="False"
-                  RowHeight="40" AlternatingRowBackground="{DynamicResource MaterialDesignPaper}" 
-                  Grid.Row="6" Grid.ColumnSpan="2" Margin="0,10,0,0">
+        <DataGrid Grid.Row="7" Grid.ColumnSpan="2"
+                  ItemsSource="{Binding SaleProducts}" 
+                  AutoGenerateColumns="False"
+                  RowHeight="40"
+                  AlternatingRowBackground="{DynamicResource MaterialDesignPaper}" 
+                  Margin="0,10,0,0">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Продукт" Binding="{Binding Product.ProductName}" Width="2*"/>
                 <DataGridTextColumn Header="Количество" Binding="{Binding CountProductSale}" Width="1*"/>
@@ -92,8 +104,10 @@
                 <DataGridTemplateColumn Header="Действия" Width="1*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="Удалить" Command="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                    CommandParameter="{Binding}" Style="{StaticResource MaterialDesignFlatButton}" />
+                            <Button Content="Удалить" 
+                                    Command="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                    CommandParameter="{Binding}" 
+                                    Style="{StaticResource MaterialDesignFlatButton}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -101,16 +115,16 @@
         </DataGrid>
 
         <!-- Итоговая стоимость -->
-        <StackPanel Orientation="Horizontal" Grid.Row="7" Grid.ColumnSpan="2" Margin="0,10,0,0">
-            <TextBlock Text="Итоговая стоимость:" FontWeight="Bold"/>
-            <TextBlock Text="{Binding TotalCost, StringFormat=\{0:R\}}" FontSize="16" FontWeight="Bold" Margin="10,0,0,0" />
+        <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <TextBlock Text="Итоговая стоимость:" FontWeight="Bold" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding TotalCost, StringFormat=\{0:R\}}" FontSize="16" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"/>
         </StackPanel>
 
         <!-- Кнопки -->
-        <UniformGrid Columns="2" Grid.Row="8" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Добавить продукт" Command="{Binding AddProductCommand}" Margin="0 0 10 0" 
-                    Style="{StaticResource MaterialDesignRaisedButton}" />
-            <Button Content="Сохранить" Command="{Binding SaveCommand}" 
+        <UniformGrid Grid.Row="9" Grid.ColumnSpan="2" Columns="2" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Добавить продукт" Command="{Binding AddProductCommand}" 
+                    Style="{StaticResource MaterialDesignRaisedButton}" Margin="0 0 10 0"/>
+            <Button Content="Сохранить" Command="{Binding SaveCommand}" IsEnabled="{Binding CanSave}"
                     Style="{StaticResource MaterialDesignRaisedButton}" />
         </UniformGrid>
     </Grid>
