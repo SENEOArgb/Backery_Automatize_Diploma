@@ -169,6 +169,35 @@ namespace App_Automatize_Backery.ViewModels
                 }
             }
         }
+
+        private void ViewSupplyRequestMaterials(object obj)
+        {
+            if (obj is SupplyRequest selectedRequest)
+            {
+                // Если уже открыт UserControl для этой же заявки — скрываем
+                if (CurrentContent is SupplyRequestsWarehousesRM currentView &&
+                    currentView.DataContext is SupplyRequestWarehouseRMViewModel currentViewModel &&
+                    currentViewModel._supplyRequest.SupplyRequestId == selectedRequest.SupplyRequestId)
+                {
+                    CurrentContent = null;
+                }
+                else
+                {
+                    // Открываем новый UserControl
+                    CurrentContent = new SupplyRequestsWarehousesRM
+                    {
+                        DataContext = new SupplyRequestWarehouseRMViewModel(selectedRequest, _mainViewModel)
+                    };
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         private async void AcceptRequest(object obj)
         {
             if (obj is SupplyRequest request)
@@ -236,34 +265,6 @@ namespace App_Automatize_Backery.ViewModels
 
             await App.DbContext.SaveChangesAsync();
             await LoadSupplyRequestsAsync(); // Перезагружаем заявки
-        }
-
-        private void ViewSupplyRequestMaterials(object obj)
-        {
-            if (obj is SupplyRequest selectedRequest)
-            {
-                // Если уже открыт UserControl для этой же заявки — скрываем
-                if (CurrentContent is SupplyRequestsWarehousesRM currentView &&
-                    currentView.DataContext is SupplyRequestWarehouseRMViewModel currentViewModel &&
-                    currentViewModel._supplyRequest.SupplyRequestId == selectedRequest.SupplyRequestId)
-                {
-                    CurrentContent = null;
-                }
-                else
-                {
-                    // Открываем новый UserControl
-                    CurrentContent = new SupplyRequestsWarehousesRM
-                    {
-                        DataContext = new SupplyRequestWarehouseRMViewModel(selectedRequest, _mainViewModel)
-                    };
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

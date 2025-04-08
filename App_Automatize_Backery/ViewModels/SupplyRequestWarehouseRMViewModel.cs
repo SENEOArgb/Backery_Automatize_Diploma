@@ -42,9 +42,7 @@ namespace App_Automatize_Backery.ViewModels
         public bool IsWorker => _mainViewModel.CurrentUser?.UserRoleId == 3;
 
         public bool IsRequestAccepted => _supplyRequest.StatusId == 2;
-
         public Visibility ManagerVisibility => IsManager ? Visibility.Visible : Visibility.Collapsed;
-
         public bool CanAddRawMaterial => IsManager && !IsRequestAccepted;
         public bool CanEditRawMaterial => IsManager && !IsRequestAccepted;
         public bool CanDeleteRawMaterial => IsManager && !IsRequestAccepted;
@@ -148,7 +146,6 @@ namespace App_Automatize_Backery.ViewModels
                 App.DbContext.SaveChangesAsync();
             }
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")

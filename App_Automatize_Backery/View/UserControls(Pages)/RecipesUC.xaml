@@ -3,10 +3,87 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_"
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{DynamicResource MaterialDesignPaper}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок и кнопка -->
+        <DockPanel Grid.Row="0" Margin="460,0,0,16">
+            <TextBlock Text="Список рецептов:"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" />
+            <Button Command="{Binding CreateRecipeCommand}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Margin="150,0,0,0" Width="180"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"
+                    Padding="12,6">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
+                    <TextBlock Text="Создать рецепт" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
+        </DockPanel>
+
+        <!-- Таблица рецептов -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Recipes}"
+                  SelectedItem="{Binding SelectedRecipe}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  RowHeight="80"
+                  MaxHeight="300"
+                  Style="{StaticResource MaterialDesignDataGrid}"
+                  Margin="0,5,0,10">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Изделие:" Binding="{Binding Product.ProductName}" Width="*"/>
+                <DataGridTemplateColumn Header="Рецепт:" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding RecipeDescription}"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Top"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Действия" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Button Content="Просмотреть"
+                                        Command="{Binding DataContext.ViewRecipeDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" 
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+
+                                <Button Content="Редактировать"
+                                        Command="{Binding DataContext.EditRecipeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Margin="5,0"/>
+
+                                <Button Content="Удалить"
+                                        Command="{Binding DataContext.DeleteRecipeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Foreground="Red" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Separator Margin="0 0 0 -700"/>
+
+        <!-- Контент: ингредиенты рецепта -->
+        <ContentControl Grid.Row="2" Content="{Binding CurrentContent}" Margin="0,20,0,0"/>
     </Grid>
 </UserControl>

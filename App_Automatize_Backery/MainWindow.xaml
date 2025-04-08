@@ -58,6 +58,12 @@
                         <TextBlock Text="Изделия"/>
                     </StackPanel>
                 </Button>
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowRecipeCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="FoodVariant" Margin="0,0,10,0"/>
+                        <TextBlock Text="Рецепты"/>
+                    </StackPanel>
+                </Button>
                 <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowProductionCommand}" Visibility="{Binding ProductionVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Manufacturing" Margin="0,0,10,0"/>

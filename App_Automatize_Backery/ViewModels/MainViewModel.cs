@@ -6,6 +6,7 @@ using App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages;
 using App_Automatize_Backery.View.UserControls_Pages_.WorkerManufactury;
 using App_Automatize_Backery.View.Windows;
 using App_Automatize_Backery.ViewModels.ProductionsVM;
+using App_Automatize_Backery.ViewModels.RecipesVM;
 using App_Automatize_Backery.ViewModels.SalesVM;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -68,6 +69,8 @@ namespace App_Automatize_Backery.ViewModels
         public ICommand ShowProductionCommand { get; }
         public ICommand ShowSaleCommand { get; }
 
+        public ICommand ShowRecipeCommand { get; }
+
         public ICommand LogoutCommand { get; }
 
         public MinBakeryDbContext _context;
@@ -123,6 +126,20 @@ namespace App_Automatize_Backery.ViewModels
                     var rawMaterialsUC = new RawMaterialsUC(this);
                     rawMaterialsUC.DataContext = new RMViewModel(this); // Привязка ViewModel
                     CurrentView = rawMaterialsUC;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при изменении CurrentView: {ex.Message}");
+                }
+            });
+
+            ShowRecipeCommand = new RelayCommand(o =>
+            {
+                try
+                {
+                    var recipesUC = new RecipesUC();
+                    recipesUC.DataContext = new RecipesViewModel(this); // Привязка ViewModel
+                    CurrentView = recipesUC;
                 }
                 catch (Exception ex)
                 {

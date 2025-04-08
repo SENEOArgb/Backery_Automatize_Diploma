@@ -1,0 +1,40 @@
+﻿<Window x:Class="App_Automatize_Backery.View.Windows.Recipes.RecipeCreateEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:App_Automatize_Backery.View.Windows.Recipes" xmlns:recipesvm="clr-namespace:App_Automatize_Backery.ViewModels.RecipesVM" d:DataContext="{d:DesignInstance Type=recipesvm:RecipeCreateEditViewModel}"
+        mc:Ignorable="d"
+        Title="RecipeCreateEditWindow" Height="310" Width="410">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Выберите изделие:" FontWeight="SemiBold"/>
+            <ComboBox ItemsSource="{Binding Products}" 
+                      SelectedValuePath="ProductId"
+                      DisplayMemberPath="ProductName"
+                      SelectedValue="{Binding Recipe.ProductId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedProduct}" 
+                      Margin="0,5,0,15"/>
+
+            <TextBlock Text="Описание рецепта:" FontWeight="SemiBold"/>
+            <TextBox Margin="0,5,0,15"
+                     Text="{Binding RecipeDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto"
+                     Height="100"
+                     TextWrapping="Wrap"/>
+
+            <Button Content="Сохранить"
+                    Command="{Binding SaveCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    HorizontalAlignment="Right"
+                    Padding="10,5"/>
+        </StackPanel>
+    </Grid>
+</Window>
