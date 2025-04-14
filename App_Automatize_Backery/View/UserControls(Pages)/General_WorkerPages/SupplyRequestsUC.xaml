@@ -55,8 +55,8 @@
                 <DataGridTextColumn Header="Статус"
                                     Binding="{Binding Status.StatusName}"
                                     Width="*" />
-                <DataGridTextColumn Header="Сумма"
-                                    Binding="{Binding TotalSalary, StringFormat={}{0} руб.}"
+                <DataGridTextColumn Header="Сумма, руб."
+                                    Binding="{Binding TotalSalary, StringFormat={}{0}}"
                                     Width="*" />
 
                 <DataGridTemplateColumn Header="" Width="2*">

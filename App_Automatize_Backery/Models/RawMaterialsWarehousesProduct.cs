@@ -29,6 +29,5 @@ public partial class RawMaterialsWarehousesProduct
     public virtual Warehouse Warehouse { get; set; } = null!;
 
     [NotMapped]
-
     public DateTime ExpirationDate => DateSupplyOrProduction.AddDays(RawMaterial.ShelfLifeDays);
 }

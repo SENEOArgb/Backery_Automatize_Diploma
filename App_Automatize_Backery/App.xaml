@@ -20,6 +20,12 @@
             <helpers:SaleStatusToIsEnabledConverter x:Key="SaleStatusToIsEnabledConverter"/>
             <helpers:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <helpers:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+            <helpers:BoolToTextConverter x:Key="BoolToTextConverter"/>
+            <helpers:BoolToCommandConverter x:Key="BoolToCommandConverter"/>
+            <helpers:BoolToIconConverter x:Key="BoolToIconConverter"/>
+            <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+            <helpers:TechnologistArchiveVisibilityConverter x:Key="TechnologistArchiveVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -34,6 +34,12 @@
                                 <TextBlock Text="Создать номенклатуру" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
+                        <Button Command="{Binding ShowArchiveCommand}" Style="{StaticResource MaterialDesignFlatButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ArchiveEye" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding IsArchiveVisible, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Архив;Список активных'}" />
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </DockPanel>
 
@@ -55,12 +61,12 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Наименование" Binding="{Binding RawMaterialName}" Width="300" />
-                        <DataGridTextColumn Header="Срок годности (дни)" Binding="{Binding ShelfLifeDays, StringFormat={}{0} д.}" Width="160" />
-                        <DataGridTextColumn Header="Цена" Binding="{Binding RawMaterialCoast, StringFormat={}{0} руб.}" Width="100" />
+                        <DataGridTextColumn Header="Срок годности,дни" Binding="{Binding ShelfLifeDays, StringFormat={}{0}}" Width="160" />
+                        <DataGridTextColumn Header="Цена,руб." Binding="{Binding RawMaterialCoast, StringFormat={}{0}}" Width="100" />
                         <DataGridTextColumn Header="Ед. измерения" Binding="{Binding MeasurementUnit.MeasurementUnitName}" Width="150" />
 
                         <!-- Кнопка Редактировать -->
-                        <DataGridTemplateColumn Header="" Width="200">
+                        <DataGridTemplateColumn Header="" Width="270">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Visibility="{Binding DataContext.TechnologistVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
@@ -71,10 +77,21 @@
                                             <materialDesign:PackIcon Kind="Pencil" Width="20" Height="20"/>
                                         </Button>
                                         <Button Style="{StaticResource MaterialDesignToolButton}"
-                                            ToolTip="Удалить" Margin="50 0 0 0 "
+                                            ToolTip="Удалить" Margin="30 0 0 0 "
                                             Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding}">
                                             <materialDesign:PackIcon Kind="Delete" Width="20" Height="20"/>
+                                        </Button>
+                                        <Button Visibility="{Binding DataContext.IsArchiveVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" Margin="20 0 0 0" Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                            <materialDesign:PackIcon Kind="Restore" Width="20" Height="20"/>
+                                        </Button>
+
+                                        <Button Visibility="{Binding DataContext.IsArchiveVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                                Command="{Binding DataContext.ArchiveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" Margin="0 0 0 0" Style="{StaticResource MaterialDesignToolButton}">
+                                            <materialDesign:PackIcon Kind="Archive" Width="20" Height="20"/>
                                         </Button>
                                     </StackPanel>
                                 </DataTemplate>

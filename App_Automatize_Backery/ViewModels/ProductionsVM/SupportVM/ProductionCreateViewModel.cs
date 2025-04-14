@@ -12,6 +12,7 @@ using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Diagnostics;
+using App_Automatize_Backery.ViewModels.SupportViewModel;
 
 namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
 {
@@ -22,6 +23,7 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
         private Recipe _selectedRecipe;
         private ProductionViewModel prViewModel;
         internal StockService _stockService;
+        internal RMWarehouseViewModel _rmWarehouseVM;
         internal Production _currentProduction; // Редактируемая запись
         private readonly Dictionary<int, CancellationTokenSource> _scheduledTasks = new();
         private readonly Dictionary<int, Task> _processingTasks = new(); // Отслеживание выполняемых задач
@@ -115,6 +117,7 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
             _context = context;
             _stockService = stockService;
             _saleFromOrder = existSale;
+            //_rmWarehouseVM = new RMWarehouseViewModel();
 
             LoadExistingProductionData();
 
@@ -139,10 +142,11 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
         {
             _context = context;
             _stockService = stockService;
+            //_rmWarehouseVM = new RMWarehouseViewModel();
             // Загружаем рецепты с продуктами
             Recipes = new ObservableCollection<Recipe>(_context.Recipes
                 .Include(r => r.Product)
-                .Where(r => r.Product != null) // Только рецепты с продуктами
+                .Where(r => r.Product != null & r.StatusRecipe != "В архиве") // Только рецепты с продуктами
                 .ToList());
 
             DateTimeStart = DateTime.Now;
@@ -298,6 +302,8 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
                 ScheduleProductionProcessing(_currentProduction, newMaterials, productCounts);
 
                 CloseWindow(true);
+
+                //_rmWarehouseVM.RefreshWarehousesRM();
             }
             catch (Exception ex)
             {
@@ -320,17 +326,23 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
 
         private bool _isProcessing = false; // Глобальная блокировка
 
-        private void ScheduleProductionProcessing(Production production, List<ProductionsRawMaterialsMeasurementUnitRecipe> materials, Dictionary<int, int> productCounts)
+        private void ScheduleProductionProcessing(Production production, List<ProductionsRawMaterialsMeasurementUnitRecipe> materials,
+                                                   Dictionary<int, int> productCounts, Sale? sale = null)
         {
-            Debug.WriteLine($"[SCHEDULE] Производство {production.ProductionId}: Перезапуск запланированной задачи...");
-
-            //CancelScheduledProcessing(production.ProductionId); // Немедленная отмена старой задачи
+            if (sale != null)
+            {
+                Debug.WriteLine($"[SCHEDULE] Производство {production.ProductionId} (Продажа {sale.SaleId}): Перезапуск запланированной задачи...");
+            }
+            else
+            {
+                Debug.WriteLine($"[SCHEDULE] Производство {production.ProductionId}: Перезапуск запланированной задачи...");
+            }
 
             var delay = production.DateTimeEnd - DateTime.Now;
             if (delay <= TimeSpan.Zero)
             {
                 Debug.WriteLine($"[EXECUTE NOW] Производство {production.ProductionId}: Немедленное списание.");
-                _ = ExecuteStockProcessing(production.ProductionId, materials, productCounts);
+                _ = ExecuteStockProcessing(production.ProductionId, materials, productCounts, sale); // Если sale null, передадим null
                 return;
             }
 
@@ -347,7 +359,7 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
                     await Task.Delay(delay);
 
                     Debug.WriteLine($"[EXECUTE] Производство {production.ProductionId}: Начинаем списание...");
-                    await ExecuteStockProcessing(production.ProductionId, materials, productCounts); //исключение
+                    await ExecuteStockProcessing(production.ProductionId, materials, productCounts, sale); // Применяем sale или null
                 }
                 catch (Exception ex)
                 {
@@ -356,7 +368,8 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
             });
         }
 
-        private async Task ExecuteStockProcessing(int productionId, List<ProductionsRawMaterialsMeasurementUnitRecipe> materials, Dictionary<int, int> productCounts)
+        private async Task ExecuteStockProcessing(int productionId, List<ProductionsRawMaterialsMeasurementUnitRecipe> materials,
+                                                   Dictionary<int, int> productCounts, Sale? sale = null)
         {
             Debug.WriteLine($"[PROCESS] Производство {productionId}: Подготовка к списанию сырья...");
 
@@ -371,7 +384,16 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
             {
                 Debug.WriteLine($"[EXECUTE] Производство {productionId}: Начинаем списание...");
 
-                await _stockService.UpdateStockForProduction(materials, productCounts);//
+                // Если есть продажа, можно выполнить дополнительные действия, связанные с ней.
+                if (sale != null)
+                {
+                    // Логика работы с продажей, например:
+                    Debug.WriteLine($"[SALE] Производство {productionId}: Привязано к продаже {sale.SaleId}.");
+                    // Можно, например, списывать товары со склада в контексте продажи или учитывать эту продажу в другой логике.
+                }
+
+                // Обновление склада, независимо от наличия продажи
+                await _stockService.UpdateStockForProduction(materials, productCounts);
 
                 Debug.WriteLine($"[SUCCESS] Производство {productionId}: Списание завершено.");
                 tcs.SetResult(true);
@@ -400,6 +422,11 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
         // Валидация данных перед сохранением
         private bool Validate()
         {
+            if (DateTimeStart == default || DateTimeEnd == default)
+            {
+                MessageBox.Show("Укажите дату и время начала и окончания производства.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
 
             if (DateTimeStart >= DateTimeEnd)
             {
@@ -407,16 +434,40 @@ namespace App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM
                 return false;
             }
 
-            if (!SelectedRecipes.Any())
+            if (SelectedRecipes == null || !SelectedRecipes.Any())
             {
                 MessageBox.Show("Добавьте хотя бы один рецепт!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
-            if (SelectedRecipes.Any(r => r.ProductCount <= 0))
+            foreach (var recipe in SelectedRecipes)
             {
-                MessageBox.Show("Количество продукта должно быть больше 0!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
+                if (recipe.ProductCount <= 0)
+                {
+                    MessageBox.Show($"Количество производимого продукта для рецепта '{recipe.Recipe?.Product.ProductName}' должно быть больше 0!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+
+                if (recipe.Ingredients == null || !recipe.Ingredients.Any())
+                {
+                    MessageBox.Show($"Рецепт '{recipe.Recipe?.Product.ProductName}' не содержит ингредиентов!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+
+                foreach (var ing in recipe.Ingredients)
+                {
+                    if (ing.RawMaterial == null || ing.MeasurementUnit == null)
+                    {
+                        MessageBox.Show($"Один из ингредиентов в рецепте '{recipe.Recipe?.Product.ProductName}' не имеет сырья или единицы измерения!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return false;
+                    }
+
+                    if (ing.CountRawMaterial <= 0)
+                    {
+                        MessageBox.Show($"Количество ингредиента '{ing.RawMaterial?.RawMaterialName}' в рецепте '{recipe.Recipe?.Product.ProductName}' должно быть больше 0!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return false;
+                    }
+                }
             }
 
             return true;

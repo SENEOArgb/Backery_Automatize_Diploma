@@ -31,6 +31,13 @@
                                 <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
                                 <TextBlock Text="Создать" FontWeight="SemiBold"/>
                             </StackPanel>
+                            
+                        </Button>
+                        <Button Command="{Binding ShowArchiveCommand}" Style="{StaticResource MaterialDesignFlatButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ArchiveEye" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding IsArchiveVisible, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Архив;Список активных'}" />
+                            </StackPanel>
                         </Button>
                     </StackPanel>
                 </DockPanel>
@@ -54,11 +61,11 @@
 
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Название" Binding="{Binding ProductName}" Width="300" />
-                            <DataGridTextColumn Header="Цена (руб.)" Binding="{Binding ProductCoast, StringFormat={}{0:F2} руб.}" Width="150" />
-                            <DataGridTextColumn Header="Тип" Binding="{Binding TypeProduct.TypeProductName}" Width="200" />
+                            <DataGridTextColumn Header="Цена,руб." Binding="{Binding ProductCoast, StringFormat={}{0:F2}}" Width="150" />
+                            <DataGridTextColumn Header="Вид" Binding="{Binding TypeProduct.TypeProductName}" Width="200" />
 
                             <!-- Кнопки действий -->
-                            <DataGridTemplateColumn Header="" Width="180">
+                            <DataGridTemplateColumn Header="" Width="280">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" Visibility="{Binding DataContext.TechnologistVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
@@ -73,6 +80,17 @@
                                                     Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
                                                 <materialDesign:PackIcon Kind="Delete" Width="20" Height="20"/>
+                                            </Button>
+                                            <Button Visibility="{Binding DataContext.IsArchiveVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" Margin="20 0 0 0" Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                                <materialDesign:PackIcon Kind="Restore" Width="20" Height="20"/>
+                                            </Button>
+
+                                            <Button Visibility="{Binding DataContext.IsArchiveVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                                Command="{Binding DataContext.ArchiveProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" Margin="0 0 0 0" Style="{StaticResource MaterialDesignToolButton}">
+                                                <materialDesign:PackIcon Kind="Archive" Width="20" Height="20"/>
                                             </Button>
                                         </StackPanel>
                                     </DataTemplate>

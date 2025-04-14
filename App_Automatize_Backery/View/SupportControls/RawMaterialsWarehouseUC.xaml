@@ -7,6 +7,7 @@
              mc:Ignorable="d" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              d:DesignHeight="600" d:DesignWidth="1000">
     <Grid Margin="10">
+        <Button Content="Обновить" Command="{Binding RefreshCommand}" Width="100" Height="40" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -70 0 10"/>
         <DataGrid ItemsSource="{Binding WarehouseItems}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"

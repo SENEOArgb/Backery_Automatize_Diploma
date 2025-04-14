@@ -32,5 +32,36 @@ namespace App_Automatize_Backery.View.Windows.Productions
             InitializeComponent();
             DataContext = new ProductionCreateViewModel(minBakeryDbContext, stockService, existSale);
         }
+
+        private void timeEnd_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            // Аналогично для времени окончания
+            string time = ((TextBox)sender).Text + e.Text;
+            TimeSpan parsedTime;
+
+            if (TimeSpan.TryParse(time, out parsedTime))
+            {
+                if (parsedTime < TimeSpan.FromHours(8) || parsedTime > TimeSpan.FromHours(21))
+                {
+                    e.Handled = true; // Отклонить ввод, если время вне диапазона
+                }
+            }
+        }
+
+        private void timeStart_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            // Проверка времени на диапазон от 08:00 до 21:00
+            string time = ((TextBox)sender).Text + e.Text;
+            TimeSpan parsedTime;
+            TimeSpan currentTime = DateTime.Now.TimeOfDay;
+
+            if (TimeSpan.TryParse(time, out parsedTime))
+            {
+                if (parsedTime < TimeSpan.FromHours(8) || parsedTime > TimeSpan.FromHours(21) || parsedTime < currentTime)
+                {
+                    e.Handled = true; // Отклонить ввод, если время вне диапазона
+                }
+            }
+        }
     }
 }

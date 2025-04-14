@@ -21,9 +21,6 @@ namespace App_Automatize_Backery
 
         public App()
         {
-            CultureInfo cultureInfo = new CultureInfo("ru-RU");
-            Thread.CurrentThread.CurrentCulture = cultureInfo;
-            Thread.CurrentThread.CurrentUICulture = cultureInfo;
             InitializeComponent();
             DbContext = new MinBakeryDbContext();
         }

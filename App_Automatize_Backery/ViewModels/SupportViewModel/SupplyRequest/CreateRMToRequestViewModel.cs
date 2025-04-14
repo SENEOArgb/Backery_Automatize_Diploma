@@ -36,7 +36,7 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel.SupplyRequest
             SupplyRequestWarehouseRMViewModel = supplyRequestWarehouseRMViewModel;
             _editingRawMaterial = editingRawMaterial;
 
-            RawMaterials = new ObservableCollection<RawMaterial>(App.DbContext.RawMaterials.ToList());
+            RawMaterials = new ObservableCollection<RawMaterial>(App.DbContext.RawMaterials.Where(p => p.StatusRawMaterial != "В архиве").ToList());
 
             if (_editingRawMaterial != null)
             {
@@ -51,6 +51,20 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel.SupplyRequest
 
         private void SaveRawMaterial(object obj)
         {
+            // Валидация: сырьё выбрано
+            if (SelectedRawMaterial == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите сырьё.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Валидация: количество > 0
+            if (CountRawMaterial <= 0)
+            {
+                MessageBox.Show("Количество сырья должно быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             if (SelectedRawMaterial != null)
             {
                 decimal totalCountSupply = 0;

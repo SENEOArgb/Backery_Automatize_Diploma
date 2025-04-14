@@ -11,6 +11,8 @@ public partial class Recipe
 
     public string? RecipeDescription { get; set; }
 
+    public string? StatusRecipe { get; set; }
+
     public virtual Product Product { get; set; } = null!;
 
     public virtual ICollection<RawMaterialMeasurementUnitRecipe> RawMaterialMeasurementUnitRecipes { get; set; } = new List<RawMaterialMeasurementUnitRecipe>();

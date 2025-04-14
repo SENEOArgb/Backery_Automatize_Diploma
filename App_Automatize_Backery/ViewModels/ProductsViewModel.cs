@@ -1,5 +1,6 @@
 ﻿using App_Automatize_Backery.Helper;
 using App_Automatize_Backery.Models;
+using App_Automatize_Backery.View.UserControls_Pages_;
 using App_Automatize_Backery.View.UserControls_Pages_.TechnologPages;
 using App_Automatize_Backery.ViewModels.ProductSupportVM;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +20,8 @@ namespace App_Automatize_Backery.ViewModels
     public class ProductsViewModel : INotifyPropertyChanged
     {
         private Product _selectedProduct;
-
-        public ObservableCollection<Product> Products { get; set; }
+        private bool _showArchive;
+        public ObservableCollection<Product> Products { get; set; } = new();
         public Product SelectedProduct
         {
             get => _selectedProduct;
@@ -34,7 +35,11 @@ namespace App_Automatize_Backery.ViewModels
 
         public ICommand CreateProductCommand { get; }
         public ICommand EditProductCommand { get; }
-        public ICommand DeleteProductCommand { get; }
+        public ICommand ArchiveProductCommand { get; }
+
+        public ICommand RestoreCommand { get; }
+
+        public ICommand ShowArchiveCommand { get; }
 
         public MainViewModel _vmMain;
 
@@ -48,18 +53,36 @@ namespace App_Automatize_Backery.ViewModels
         public Visibility WorkerMenuVisibility => IsWorker ? Visibility.Visible : Visibility.Collapsed;
         public Visibility TechnologistVisibility => IsTechnolog ? Visibility.Visible : Visibility.Hidden;
 
+
+        public bool IsArchiveVisible => _showArchive;
         public ProductsViewModel(MainViewModel mainViewModel)
         {
             _vmMain = mainViewModel;
-            LoadProducts();
             CreateProductCommand = new RelayCommand(_ => OpenCreateEditWindow(null));
             EditProductCommand = new RelayCommand(_ => OpenCreateEditWindow(SelectedProduct), _ => SelectedProduct != null);
-            DeleteProductCommand = new RelayCommand(_ => DeleteProduct(), _ => SelectedProduct != null);
+            ArchiveProductCommand = new RelayCommand(param => ArchiveProduct(param as Product), param => param is Product);
+            RestoreCommand = new RelayCommand(param => RestoreProduct(param as Product), param => param is Product);
+            ShowArchiveCommand = new RelayCommand(_ => ToggleArchive());
+            LoadProducts();
         }
 
         private void LoadProducts()
         {
-            Products = new ObservableCollection<Product>(App.DbContext.Products.Include(p => p.TypeProduct).ToList());
+            SelectedProduct = null;
+            Products.Clear();
+
+            var query = App.DbContext.Products
+                .Include(p => p.TypeProduct)
+                .AsQueryable();
+
+            if (!_showArchive)
+                query = query.Where(rm => rm.StatusProduct == "Активна");
+            else
+                query = query.Where(rm => rm.StatusProduct == "В архиве");
+
+            foreach (var product in query.ToList())
+                Products.Add(product);
+
             OnPropertyChanged(nameof(Products));
         }
 
@@ -76,14 +99,43 @@ namespace App_Automatize_Backery.ViewModels
             }
         }
 
-        private void DeleteProduct()
+        private void ArchiveProduct(Product product)
         {
-            if (SelectedProduct == null) return;
+            if (product == null) return;
 
-            App.DbContext.Products.Remove(SelectedProduct);
+            var result = MessageBox.Show(
+                "Вы уверены, что хотите архивировать этот продукт?",
+                "Подтверждение",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                product.StatusProduct = "В архиве";
+                App.DbContext.Update(product);
+                App.DbContext.SaveChanges();
+                LoadProducts();
+            }
+        }
+
+        private void RestoreProduct(Product product)
+        {
+            if (product == null) return;
+
+            var result = MessageBox.Show("Вы уверены, что хотите восстановить в список активных эту номенклатуру?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
+            product.StatusProduct = "Активна";
+            App.DbContext.Update(product);
             App.DbContext.SaveChanges();
+            LoadProducts();
+        }
 
-            Products.Remove(SelectedProduct);
+        private void ToggleArchive()
+        {
+            _showArchive = !_showArchive;
+            LoadProducts();
+            OnPropertyChanged(nameof(IsArchiveVisible));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

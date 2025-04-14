@@ -17,6 +17,7 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages;
 using Azure.Core;
+using DocumentFormat.OpenXml.InkML;
 
 namespace App_Automatize_Backery.ViewModels
 {
@@ -265,6 +266,38 @@ namespace App_Automatize_Backery.ViewModels
 
             await App.DbContext.SaveChangesAsync();
             await LoadSupplyRequestsAsync(); // Перезагружаем заявки
+
+            // 1. Создаём Parish (приход по продаже)
+            var expence = new Expence
+            {
+                ExpenceDate = requestToUpdate.SupplyRequestDate,
+                SupplyRequestId = requestToUpdate.SupplyRequestId,
+                ExpenceCoast = (decimal)requestToUpdate.TotalSalary
+            };
+
+            await App.DbContext.Expences.AddAsync(expence);
+            await App.DbContext.SaveChangesAsync(); // нужно получить parish.ParishId
+
+            // 2. Создаём Report
+            var report = new Report
+            {
+                ReportDate = DateTime.Now,
+                UserId = requestToUpdate.UserId,
+                ReportType = $"Поставка: { requestToUpdate.SupplyRequestId }"
+            };
+
+            await App.DbContext.Reports.AddAsync(report);
+            await App.DbContext.SaveChangesAsync(); // нужно получить report.ReportId
+
+            // 3. Ассоциируем Report <-> Parish через ExpencesReportsParishes
+            var link = new ExpencesReportsParish
+            {
+                ExpenceId = expence.ExpenceId,
+                ReportId = report.ReportId
+            };
+
+            await App.DbContext.ExpencesReportsParishes.AddAsync(link);
+            await App.DbContext.SaveChangesAsync();
         }
     }
 }

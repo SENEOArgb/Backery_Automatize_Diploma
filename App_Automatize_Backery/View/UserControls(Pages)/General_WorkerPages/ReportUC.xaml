@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages.ReportUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages"
+             mc:Ignorable="d" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:reportsvm="clr-namespace:App_Automatize_Backery.ViewModels.ReportsVM" d:DataContext="{d:DesignInstance Type=reportsvm:ReportViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <TextBlock Text="Отчёты" FontSize="28" FontWeight="Bold"
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" />
+        </StackPanel>
+
+        <!-- Кнопки -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,20">
+            <Button Content="Папка с отчётами"
+                    Command="{Binding OpenReportsFolderCommand}"
+                    Style="{StaticResource MaterialDesignFlatButton}" 
+                    Margin="5,0"/>
+            <Button Content="Создать отчёт за период"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Command="{Binding OpenGenerateByPeriodWindowCommand}"
+                    Margin="5,0"/>
+        </StackPanel>
+
+        <!-- Отображение отчётов -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Reports}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <materialDesign:Card Margin="0,0,0,15" Padding="15">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="{Binding ReportDate, StringFormat='Дата: {0:dd.MM.yyyy HH:mm}'}"
+                                           FontSize="16" FontWeight="SemiBold" Foreground="Gray"/>
+                                <TextBlock Text="{Binding ReportType, StringFormat='Тип отчёта: {0}'}"
+                                           Grid.Row="1" FontSize="16" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding User.FullName, StringFormat='Создан: {0}'}"
+                                           Grid.Row="2" FontSize="16" Margin="0,5,0,0"/>
+                                <Button Content="Просмотреть"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Command="{Binding DataContext.GenerateWordReportCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Grid.Row="3" HorizontalAlignment="Right"
+                                        Margin="0,10,0,0"/>
+                            </Grid>
+                        </materialDesign:Card>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

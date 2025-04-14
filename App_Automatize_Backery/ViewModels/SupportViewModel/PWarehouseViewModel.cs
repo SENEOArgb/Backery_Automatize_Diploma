@@ -1,4 +1,5 @@
-﻿using App_Automatize_Backery.Models;
+﻿using App_Automatize_Backery.Helper;
+using App_Automatize_Backery.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace App_Automatize_Backery.ViewModels.SupportViewModel
 {
@@ -30,17 +32,33 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel
         {
             _context = App.DbContext;
             LoadProducts();
+            RefreshCommand = new RelayCommand(async (param) => await RefreshWarehousesP());
             StartCleanupTask();  // Инициализируем задачу очистки
         }
 
-        private void LoadProducts()
+        internal void LoadProducts()
         {
+            //_warehouseItems.Clear();
             WarehouseItems = new ObservableCollection<RawMaterialsWarehousesProduct>(
                 _context.RawMaterialsWarehousesProducts
                     .Include(r => r.Product)
                     .Where(r => r.Product != null)
                     .ToList()
             );
+        }
+
+        public ICommand RefreshCommand;
+
+        public async Task RefreshWarehousesP()
+        {
+            var productWarehouses = _context.RawMaterialsWarehousesProducts
+                .Include(r => r.Product)
+                .Where(r => r.Product != null)
+                .ToList();
+
+            WarehouseItems.Clear();
+            foreach (var item in productWarehouses)
+                WarehouseItems.Add(item);
         }
 
         private void StartCleanupTask()

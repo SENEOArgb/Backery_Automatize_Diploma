@@ -87,9 +87,10 @@ namespace App_Automatize_Backery.ViewModels
             CurrentView = new ProductsWarehouseUC { DataContext = _productsViewModel };
         }
 
-        private void ShowRawMaterialsView()
+        private async void ShowRawMaterialsView()
         {
             SelectedTabIndex = 1;
+            await _rawMaterialsViewModel.RefreshWarehousesRM();
             CurrentView = new RawMaterialsWarehouseUC { DataContext = _rawMaterialsViewModel };
         }
 

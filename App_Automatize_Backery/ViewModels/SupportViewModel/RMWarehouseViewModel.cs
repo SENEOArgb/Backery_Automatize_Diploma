@@ -1,4 +1,6 @@
-﻿using App_Automatize_Backery.Models;
+﻿using App_Automatize_Backery.Helper;
+using App_Automatize_Backery.Models;
+using App_Automatize_Backery.View.SupportControls;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace App_Automatize_Backery.ViewModels.SupportViewModel
 {
@@ -31,6 +34,8 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel
         {
             _context = App.DbContext;
             LoadRawMaterials();
+            RefreshCommand = new RelayCommand(async (param) => await RefreshWarehousesRM());
+            //RefreshWarehousesRM();
             StartCleanupTask();  // Инициализируем задачу очистки
         }
 
@@ -43,6 +48,30 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel
                     .ToList()
             );
         }
+
+        public ICommand RefreshCommand { get; }
+
+        public async Task RefreshWarehousesRM()
+        {
+            using (var newContext = new MinBakeryDbContext())
+            {
+                var rawMaterialWarehouses = newContext.RawMaterialsWarehousesProducts
+                    .Include(r => r.RawMaterial)
+                    .Where(r => r.RawMaterial != null)
+                    .ToList();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    WarehouseItems.Clear();
+                    foreach (var item in rawMaterialWarehouses)
+                    {
+                        WarehouseItems.Add(item);
+                    }
+                });
+            }
+        }
+
+
 
         private void StartCleanupTask()
         {

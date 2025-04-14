@@ -52,7 +52,7 @@
                 <DataGridTextColumn Header="Тип продажи" Binding="{Binding TypeSale}" Width="300" />
                 <DataGridTextColumn Header="Дата" Binding="{Binding DateTimeSale, StringFormat='dd.MM.yyyy HH:mm'}" Width="300" />
                 <DataGridTextColumn Header="Статус" Binding="{Binding SaleStatus}" Width="150" />
-                <DataGridTextColumn Header="Сумма" Binding="{Binding CoastSale, StringFormat={}{0} руб.}" Width="100" />
+                <DataGridTextColumn Header="Сумма" Binding="{Binding CoastSale, StringFormat={}{0}}" Width="100" />
                 <DataGridTemplateColumn Header="                                       Действия" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

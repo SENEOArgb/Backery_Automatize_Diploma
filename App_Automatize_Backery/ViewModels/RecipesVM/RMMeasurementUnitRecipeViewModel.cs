@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace App_Automatize_Backery.ViewModels.RecipesVM
@@ -25,6 +26,15 @@ namespace App_Automatize_Backery.ViewModels.RecipesVM
         public ICommand AddIngredientCommand { get; }
         public ICommand EditIngredientCommand { get; }
         public ICommand DeleteIngredientCommand { get; }
+
+        public bool IsManager => _mainVM.CurrentUser?.UserRoleId == 2;  // Зав. производством
+        public bool IsWorker => _mainVM.CurrentUser?.UserRoleId == 3;   // Сотрудник на производстве
+        public bool IsTechnolog => _mainVM.CurrentUser?.UserRoleId == 1;
+
+        // Видимость
+        public Visibility ManagerMenuVisibility => IsManager ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility WorkerMenuVisibility => IsWorker ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility TechnologistVisibility => IsTechnolog ? Visibility.Visible : Visibility.Hidden;
 
         public RMMeasurementUnitRecipeViewModel(Recipe recipe, MainViewModel mainVM)
         {

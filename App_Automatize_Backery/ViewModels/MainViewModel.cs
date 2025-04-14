@@ -5,8 +5,10 @@ using App_Automatize_Backery.View.UserControls_Pages_;
 using App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages;
 using App_Automatize_Backery.View.UserControls_Pages_.WorkerManufactury;
 using App_Automatize_Backery.View.Windows;
+using App_Automatize_Backery.View.Windows.Sales;
 using App_Automatize_Backery.ViewModels.ProductionsVM;
 using App_Automatize_Backery.ViewModels.RecipesVM;
+using App_Automatize_Backery.ViewModels.ReportsVM;
 using App_Automatize_Backery.ViewModels.SalesVM;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -28,7 +30,7 @@ namespace App_Automatize_Backery.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-
+        private readonly Action _closeAction;
         private object _currentView;
         public object CurrentView
         {
@@ -68,14 +70,14 @@ namespace App_Automatize_Backery.ViewModels
         public ICommand ShowUserCommand { get; }
         public ICommand ShowProductionCommand { get; }
         public ICommand ShowSaleCommand { get; }
-
+        public ICommand ShowReportsCommand { get; }
         public ICommand ShowRecipeCommand { get; }
 
         public ICommand LogoutCommand { get; }
 
         public MinBakeryDbContext _context;
         internal readonly StockService _stockService;
-
+        private SaleCreateEditWindow _parentWindow;
         public string RoleName => CurrentUser?.UserRole?.UserRoleName ?? "Неизвестно";  // Возвращаем имя роли
 
         private SupplyRequestViewModel _supplyRequestViewModel;
@@ -89,6 +91,8 @@ namespace App_Automatize_Backery.ViewModels
 
             _context = App.DbContext;
             _stockService = new StockService(_context);
+            _closeAction = _closeAction;
+            _parentWindow = _parentWindow;
 
             // Загрузка данных о произведенной продукции
             LoadDailyProduction();
@@ -206,12 +210,25 @@ namespace App_Automatize_Backery.ViewModels
                 try
                 {
                     var saleUC = new SalesUC();
-                    saleUC.DataContext = new SalesViewModel(_context, this);
+                    saleUC.DataContext = new SalesViewModel(_context, this, _closeAction, _parentWindow);
                     CurrentView = saleUC;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Ошибка при изменении CurrentView: {ex.Message}");
+                }
+            });
+            ShowReportsCommand = new RelayCommand(o =>
+            {
+                try
+                {
+                    var reportUC = new ReportUC(this);
+                    reportUC.DataContext = new ReportViewModel(this); // или передай контекст
+                    CurrentView = reportUC;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при отображении ReportUC: {ex.Message}");
                 }
             });
         }

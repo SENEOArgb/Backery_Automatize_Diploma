@@ -51,12 +51,28 @@ namespace App_Automatize_Backery.ViewModels.ProductSupportVM
 
         private bool CanSave()
         {
-            return !string.IsNullOrWhiteSpace(Product.ProductName) && Product.ProductCoast > 0;
+            return !string.IsNullOrWhiteSpace(Product.ProductName) &&
+                   Product.ProductCoast > 0 &&
+                   Product.TypeProductId > 0;
         }
-
         private void Save()
         {
-            if (IsEditMode)
+            if (!IsEditMode)
+            {
+                // Проверка на дубликат названия
+                var duplicate = App.DbContext.Products
+                    .Any(p => p.ProductName.ToLower() == Product.ProductName.ToLower() && p.StatusProduct != "Удалена");
+
+                if (duplicate)
+                {
+                    System.Windows.MessageBox.Show("Продукт с таким названием уже существует.", "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
+                Product.StatusProduct = "Активна";
+                App.DbContext.Products.Add(Product);
+            }
+            else
             {
                 var existingProduct = App.DbContext.Products.Find(Product.ProductId);
                 if (existingProduct != null)
@@ -64,12 +80,8 @@ namespace App_Automatize_Backery.ViewModels.ProductSupportVM
                     existingProduct.ProductName = Product.ProductName;
                     existingProduct.TypeProductId = Product.TypeProductId;
                     existingProduct.ProductCoast = Product.ProductCoast;
+                    App.DbContext.Products.Update(existingProduct);
                 }
-                App.DbContext.Products.Update(existingProduct);
-            }
-            else
-            {
-                App.DbContext.Products.Add(Product);
             }
 
             App.DbContext.SaveChanges();

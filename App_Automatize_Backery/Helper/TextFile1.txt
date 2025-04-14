@@ -16,3 +16,8 @@
     [NotMapped]
 
     public DateTime ExpirationDate => DateSupplyOrProduction.AddDays(RawMaterial.ShelfLifeDays);
+
+    Product.cs
+
+        [NotMapped]
+    public string TypeProductName => TypeProduct.TypeProductName;

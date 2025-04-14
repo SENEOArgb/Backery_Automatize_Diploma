@@ -8,7 +8,8 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:salesvm="clr-namespace:App_Automatize_Backery.ViewModels.SalesVM" d:DataContext="{d:DesignInstance Type=salesvm:SaleCreateEditViewModel}"
             xmlns:helpers="clr-namespace:App_Automatize_Backery.Helper.Converters"
         Title="SaleCreateEditWindow" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded" xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         Style="{StaticResource MaterialDesignWindow}">
     <Window.Resources>
         <helpers:TimeSpanToDateTimeConverter x:Key="TimeSpanToDateTimeConverter" />
@@ -16,25 +17,15 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Заголовок -->
             <RowDefinition Height="Auto"/>
-            <!-- Тип продажи -->
             <RowDefinition Height="Auto"/>
-            <!-- Дата -->
             <RowDefinition Height="Auto"/>
-            <!-- Время -->
             <RowDefinition Height="Auto"/>
-            <!-- Продукт -->
             <RowDefinition Height="Auto"/>
-            <!-- Кол-во -->
             <RowDefinition Height="10"/>
-            <!-- Отступ -->
             <RowDefinition Height="*"/>
-            <!-- Таблица -->
             <RowDefinition Height="Auto"/>
-            <!-- Итог -->
             <RowDefinition Height="Auto"/>
-            <!-- Кнопки -->
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -61,14 +52,14 @@
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Дата:" VerticalAlignment="Center"/>
         <DatePicker x:Name="DatePickerControl" Grid.Row="2" Grid.Column="1"
                     SelectedDate="{Binding SelectedOrderDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                    Style="{StaticResource MaterialDesignDatePicker}" 
+                    Style="{StaticResource MaterialDesignDatePicker}"
                     Width="250" Margin="0,5"/>
 
         <!-- Время продажи -->
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Время:" VerticalAlignment="Center"/>
         <materialDesign:TimePicker Grid.Row="3" Grid.Column="1"
                                    Is24Hours="True" SelectedTime="{Binding SelectedOrderTime, Mode=TwoWay, StringFormat='HH:mm', 
-                                                    UpdateSourceTrigger=PropertyChanged}"
+                                   UpdateSourceTrigger=PropertyChanged}" SelectedTimeChanged="selTime_SelectedTimeChanged"
                                    Style="{StaticResource MaterialDesignTimePicker}"
                                    Width="250" Margin="0,5"
                                    x:Name="selTime">
@@ -124,7 +115,7 @@
         <UniformGrid Grid.Row="9" Grid.ColumnSpan="2" Columns="2" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Content="Добавить продукт" Command="{Binding AddProductCommand}" 
                     Style="{StaticResource MaterialDesignRaisedButton}" Margin="0 0 10 0"/>
-            <Button Content="Сохранить" Command="{Binding SaveCommand}" IsEnabled="{Binding CanSave}"
+            <Button Content="Сохранить" Command="{Binding SaveCommand}"
                     Style="{StaticResource MaterialDesignRaisedButton}" />
         </UniformGrid>
     </Grid>

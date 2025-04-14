@@ -18,6 +18,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Animation;
+using App_Automatize_Backery.ViewModels.SupportViewModel;
+using App_Automatize_Backery.View.Windows.Sales;
 
 namespace App_Automatize_Backery.ViewModels.SalesVM
 {
@@ -27,12 +29,15 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
         private decimal? _totalCost;
         private Product _selectedProduct;
         private int _selectedProductQuantity;
-        private DateTime _selectedOrderDate;
-        private TimeSpan _selectedOrderTime;
+        private DateTime? _selectedOrderDate;
+        internal RMWarehouseViewModel _rmWarehouseVM;
+        private DateTime? _selectedOrderTime;
         private CancellationTokenSource _cancellationTokenSource;
         private MainViewModel vmMain;
         internal ProductionCreateViewModel vmProdCreate;
         public Action<bool>? CloseAction { get; set; }
+
+        private readonly Action _closeAction;
 
         StockService _stockService;
 
@@ -60,7 +65,6 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             }
         }
 
-
         public Product SelectedProduct
         {
             get => _selectedProduct;
@@ -81,25 +85,25 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             }
         }
 
-
-        public DateTime SelectedOrderDate
+        private SaleCreateEditWindow _parentWindow;
+        public DateTime? SelectedOrderDate
         {
             get => _selectedOrderDate;
             set
             {
-                _selectedOrderDate = value;
-                UpdateDateTimeSale();
+                _selectedOrderDate = value ;
+                //UpdateDateTimeSale();
                 OnPropertyChanged(nameof(SelectedOrderDate));
             }
         }
 
-        public TimeSpan SelectedOrderTime
+        public DateTime? SelectedOrderTime
         {
             get => _selectedOrderTime;
             set
             {
                 _selectedOrderTime = value;
-                UpdateDateTimeSale();
+                //UpdateDateTimeSale();
                 OnPropertyChanged(nameof(SelectedOrderTime));
             }
         }
@@ -120,11 +124,12 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
 
         public readonly MinBakeryDbContext _context;
 
-        public SaleCreateEditViewModel(MinBakeryDbContext context, MainViewModel mainViewModel, Sale? sale = null)
+        public SaleCreateEditViewModel(MinBakeryDbContext context, MainViewModel mainViewModel, Action closeAction, SaleCreateEditWindow window, Sale? sale = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             vmMain = mainViewModel;
-
+            _closeAction = closeAction;
+            _parentWindow = window;
             Sale = sale ?? new Sale();
 
             SelectedSaleType = Sale.TypeSale;
@@ -133,16 +138,16 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             if (Sale.DateTimeSale != default)
             {
                 SelectedOrderDate = Sale.DateTimeSale.Date;
-                SelectedOrderTime = Sale.DateTimeSale.TimeOfDay;
+                SelectedOrderTime = Sale.DateTimeSale;
             }
             else
             {
                 SelectedOrderDate = DateTime.Now.Date;
-                SelectedOrderTime = DateTime.Now.TimeOfDay;
+                SelectedOrderTime = DateTime.Now;
             }
 
 
-            Products = new ObservableCollection<Product>(_context.Products.AsNoTracking().ToList());
+            Products = new ObservableCollection<Product>(_context.Products.Where(p => p.StatusProduct != "В архиве").AsNoTracking().ToList());
             SelectedProduct = _context.Products.FirstOrDefault();
 
             AddProductCommand = new RelayCommand(_ => AddProduct());
@@ -436,7 +441,8 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                     MessageBox.Show("Пользователь не авторизован.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-
+                if (!ValidateSale())
+                    return;
 
                 Sale.UserId = vmMain.CurrentUser.UserId;
                 Sale.SaleStatus = SelectedSaleType == "Прямая продажа" ? "Завершена" : "В процессе";
@@ -450,7 +456,7 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                     TotalCost = TotalCost * (1 - discount);
                     Sale.CoastSale = TotalCost;
                 }
-
+                Sale.SaleId = 0;
                 await _context.Sales.AddAsync(Sale);
                 await _context.SaveChangesAsync();
 
@@ -458,15 +464,6 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                 {
                     try
                     {
-                        //bool isNewSale = Sale.SaleId == 0;
-
-                       /* if (!isNewSale)
-                            await RestoreStockFromPreviousSale(Sale.SaleId);
-
-                        if (isNewSale)
-                            _context.Sales.Add(Sale);
-                        else
-                            _context.Sales.Update(Sale);*/
 
                         foreach (var saleProduct in SaleProducts)
                         {
@@ -479,6 +476,39 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                         }
 
                         await _context.SaveChangesAsync();
+
+                        // 1. Создаём Parish (приход по продаже)
+                        var parish = new Parish
+                        {
+                            ParisheDateTime = Sale.DateTimeSale,
+                            SaleId = Sale.SaleId,
+                            ParisheSize = (decimal)Sale.CoastSale
+                        };
+
+                        await _context.Parishes.AddAsync(parish);
+                        await _context.SaveChangesAsync(); // нужно получить parish.ParishId
+
+                        // 2. Создаём Report
+                        var report = new Report
+                        {
+                            ReportDate = DateTime.Now,
+                            UserId = Sale.UserId,
+                            ReportType = $"Продажа {Sale.SaleId}"
+                        };
+
+                        await _context.Reports.AddAsync(report);
+                        await _context.SaveChangesAsync(); // нужно получить report.ReportId
+
+                        // 3. Ассоциируем Report <-> Parish через ExpencesReportsParishes
+                        var link = new ExpencesReportsParish
+                        {
+                            ParisheId = parish.ParisheId,
+                            ReportId = report.ReportId
+                        };
+
+                        await _context.ExpencesReportsParishes.AddAsync(link);
+                        await _context.SaveChangesAsync();
+
                         await transaction.CommitAsync();
 
                         MessageBox.Show("Продажа успешно сохранена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -498,17 +528,30 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                 {
                     using (var tempContext = new MinBakeryDbContext())
                     {
+                        _parentWindow.DialogResult = true;
+                        _parentWindow.Close();
                         bool productionCreated = await CreateProductionForOrderAsync(Sale.SaleId, tempContext);
                         if (productionCreated)
                         {
+                            _closeAction?.Invoke();
                             //await UpdateSaleTaskAsync(Sale);
                         }
                         else
                         {
                             MessageBox.Show("Создание производства было отменено. Продажа сохранена, но производство не запущено.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                            _closeAction?.Invoke();
                         }
                     }
                 }
+                else
+                {
+                    using (var tempCont = new MinBakeryDbContext())
+                    {
+                        await ProcessImmediateSaleAsync();
+                        _closeAction?.Invoke();
+                    }
+                }
+                //_.RefreshWarehousesRM();
             }
             catch (Exception ex)
             {
@@ -524,10 +567,18 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             Debug.WriteLine($"SelectedOrderDate: {SelectedOrderDate}, SelectedOrderTime: {SelectedOrderTime}");
             if (SelectedSaleType == "Заказ")
             {
-                if (SelectedOrderDate != null && SelectedOrderTime != null)
+                if (SelectedOrderDate != null && SelectedOrderTime != null && SelectedOrderDate.HasValue && SelectedOrderTime.HasValue)
                 {
+                    var date = SelectedOrderDate.Value.Date;
+                    Debug.WriteLine($"Дата: {date}");
+                    var time = SelectedOrderTime.Value.TimeOfDay;
+                    Debug.WriteLine($"Время: {time}");
+                    DateTime orderDateTime = date + time;
                     Debug.WriteLine($"SelectedOrderDate: {SelectedOrderDate}, SelectedOrderTime: {SelectedOrderTime}");
-                    Sale.DateTimeSale = SelectedOrderDate.Date.Add(SelectedOrderTime);
+                    Sale.TypeSale = SelectedSaleType;
+                    Sale.DateTimeSale = orderDateTime;
+
+                    Debug.WriteLine($"Установлено время продажи: {Sale.DateTimeSale}");
                     Debug.WriteLine($"Final Sale DateTimeSale: {Sale.DateTimeSale}");
                 }
                 else
@@ -584,182 +635,104 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             await _context.SaveChangesAsync();
         }
 
-        private async Task RestoreStockFromPreviousSale(int saleId)
+        private bool ValidateSale()
         {
-            using (var dbContext = new MinBakeryDbContext())
-            {
-                var previousSaleProducts = await dbContext.SaleProducts
-                    .Where(sp => sp.SaleId == saleId)
-                    .ToListAsync();
-
-                foreach (var saleProduct in previousSaleProducts)
-                {
-                    var warehouseProduct = await dbContext.RawMaterialsWarehousesProducts
-                        .FirstOrDefaultAsync(wp => wp.ProductId == saleProduct.ProductId);
-
-                    if (warehouseProduct != null)
-                    {
-                        warehouseProduct.RawMaterialCount += saleProduct.CountProductSale;
-                    }
-                }
-
-                await dbContext.SaveChangesAsync();
-            }
-        }
-
-        private async Task ProcessScheduledSaleAsync(Sale sale, List<SaleProduct> saleProducts)
-        {
-            try
-            {
-                _cancellationTokenSource?.Cancel();
-                _cancellationTokenSource = new CancellationTokenSource();
-                var token = _cancellationTokenSource.Token;
-
-                TimeSpan delay = sale.DateTimeSale - DateTime.Now;
-
-                if (delay.TotalMilliseconds <= 0)
-                {
-                    MessageBox.Show($"Время выполнения заказа {sale.SaleId} уже прошло!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                await Task.Delay(delay, token);
-
-                if (token.IsCancellationRequested)
-                {
-                    MessageBox.Show($"Запланированная продажа {sale.SaleId} была отменена.", "Отмена", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-
-                using (var dbContext = new MinBakeryDbContext())
-                {
-                    using (var transaction = await dbContext.Database.BeginTransactionAsync(token))
-                    {
-                        try
-                        {
-                            var dbSale = await dbContext.Sales.FirstOrDefaultAsync(s => s.SaleId == sale.SaleId, token);
-                            if (dbSale == null)
-                            {
-                                MessageBox.Show($"Заказ {sale.SaleId} не найден!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                                return;
-                            }
-
-                            foreach (var saleProduct in saleProducts)
-                            {
-                                var warehouseProduct = await dbContext.RawMaterialsWarehousesProducts
-                                    .FirstOrDefaultAsync(wp => wp.ProductId == saleProduct.ProductId, token);
-
-                                if (warehouseProduct == null || warehouseProduct.RawMaterialCount < saleProduct.CountProductSale)
-                                {
-                                    throw new InvalidOperationException($"Недостаточно товара {saleProduct.Product.ProductName} на складе!");
-                                }
-
-                                warehouseProduct.RawMaterialCount -= saleProduct.CountProductSale;
-                                saleProduct.SaleId = dbSale.SaleId;
-                                dbContext.SaleProducts.Add(saleProduct);
-                            }
-
-                            dbSale.SaleStatus = "Завершена";
-                            await dbContext.SaveChangesAsync(token);
-                            await transaction.CommitAsync(token);
-                        }
-                        catch (Exception ex)
-                        {
-                            await transaction.RollbackAsync(token);
-                            MessageBox.Show($"Ошибка при выполнении заказа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка выполнения запланированной продажи: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private bool Validate()
-        {
-            // Проверка пользователя
-            if (vmMain?.CurrentUser == null)
-            {
-                MessageBox.Show("Пользователь не авторизован.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-
-            // Проверка продуктов
-            if (SaleProducts == null || SaleProducts.Count == 0)
-            {
-                MessageBox.Show("Добавьте хотя бы один продукт в продажу.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-
-            if (SaleProducts.Any(p => p.CountProductSale <= 0))
-            {
-                MessageBox.Show("У одного или нескольких продуктов указано неверное количество.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-
-            // Проверка типа продажи
             if (string.IsNullOrWhiteSpace(SelectedSaleType))
             {
                 MessageBox.Show("Выберите тип продажи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
 
-            //SetSaleTypeAndDateTime(); // Установим актуальную дату и время из Selected*
-
-/*            if (SelectedSaleType == "Прямая продажа")
+            if (Sale == null)
             {
-                // Нельзя в будущем
-                if (Sale.DateTimeSale > DateTime.Now)
+                MessageBox.Show("Объект продажи не инициализирован.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            if (SaleProducts == null || SaleProducts.Count == 0)
+            {
+                MessageBox.Show("Добавьте хотя бы один продукт в продажу.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            if (vmMain?.CurrentUser == null)
+            {
+                MessageBox.Show("Пользователь не авторизован.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            if (SelectedSaleType == "Заказ")
+            {
+                if (!SelectedOrderDate.HasValue || !SelectedOrderTime.HasValue)
                 {
-                    MessageBox.Show("Нельзя установить время в будущем для прямой продажи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Пожалуйста, выберите дату и время заказа.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                var orderDateTime = SelectedOrderDate.Value.Date + SelectedOrderTime.Value.TimeOfDay;
+
+                if (orderDateTime < DateTime.Now)
+                {
+                    MessageBox.Show("Дата и время заказа не могут быть в прошлом.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                // 🔒 Проверка: дата не позже, чем через 7 дней
+                if (SelectedOrderDate.Value.Date > DateTime.Today.AddDays(7))
+                {
+                    MessageBox.Show("Дата заказа не может быть позже, чем через 7 дней от сегодняшней.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                // 🔒 Проверка: дата не раньше сегодняшнего дня
+                if (SelectedOrderDate.Value.Date < DateTime.Today)
+                {
+                    MessageBox.Show("Дата заказа не может быть раньше сегодняшней.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
             }
-            else if (SelectedSaleType == "Заказ")
+
+            if (TotalCost <= 0)
             {
-                if (Sale.DateTimeSale <= DateTime.Now)
+                MessageBox.Show("Общая стоимость продажи должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            var time = Sale.DateTimeSale.TimeOfDay;
+            if (time < new TimeSpan(8, 0, 0) || time > new TimeSpan(21, 0, 0))
+            {
+                MessageBox.Show("Продажи возможны только с 08:00 до 21:00.", "Недопустимое время", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (Sale.DateTimeSale.Date < DateTime.Today || Sale.DateTimeSale.Date > DateTime.Today.AddDays(7))
+            {
+                MessageBox.Show("Дата продажи должна быть от сегодня и не позже, чем через 7 дней.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            foreach (var prod in SaleProducts)
+            {
+                if (prod.ProductId <= 0)
                 {
-                    MessageBox.Show("Время заказа должно быть в будущем.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Один или несколько продуктов в продаже не имеют корректного ID.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
 
-                if ((Sale.DateTimeSale - DateTime.Now).TotalDays > 2)
+                if (prod.CountProductSale <= 0)
                 {
-                    MessageBox.Show("Заказ нельзя установить позже, чем через 2 дня.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Количество для продукта '{prod?.Product?.ProductName}' должно быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
-            }*/
+
+                if (prod.CoastToProduct <= 0)
+                {
+                    MessageBox.Show($"Цена продукта '{prod?.Product?.ProductName}' должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+            }
 
             return true;
-        }
-
-        private void CloseWindow(bool dialogResult)
-        {
-            foreach (Window window in Application.Current.Windows)
-            {
-                if (window is View.Windows.Sales.SaleCreateEditWindow createWindow)
-                {
-                    createWindow.DialogResult = dialogResult;
-                    createWindow.Close();
-                    break;
-                }
-            }
-        }
-
-        private void UpdateDateTimeSale()
-        {
-            if (SelectedSaleType == "Прямая продажа")
-            {
-                Sale.DateTimeSale = DateTime.Now;
-            }
-            else if (SelectedSaleType == "Заказ")
-            {
-                Sale.DateTimeSale = SelectedOrderDate.Date + SelectedOrderTime;
-            }
-
-            Debug.WriteLine($"[DEBUG] Sale.DateTimeSale: {Sale.DateTimeSale}");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

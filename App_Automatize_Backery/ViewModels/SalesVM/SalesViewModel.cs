@@ -24,8 +24,10 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
         private bool _isSaleDetailsVisible = false; // Флаг для управления видимостью
 
         private Dictionary<int, CancellationTokenSource> _saleCancellationTokens = new Dictionary<int, CancellationTokenSource>();
-
+        private readonly Action _closeAction;
         public ObservableCollection<Sale> Sales { get; } = new();
+
+        private SaleCreateEditWindow _parentWindow;
 
         public Sale SelectedSale
         {
@@ -59,22 +61,24 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
 
         public ICommand DeleteSaleCommand { get; }
 
-        public SalesViewModel(MinBakeryDbContext context, MainViewModel mainViewModel)
+        public SalesViewModel(MinBakeryDbContext context, MainViewModel mainViewModel, Action action, SaleCreateEditWindow parentWindow)
         {
             _mainViewModel = mainViewModel;
-
+            _closeAction = action;
             CreateSaleCommand = new RelayCommand(_ => CreateSale());
-            EditSaleCommand = new RelayCommand(sale => EditSale(sale as Sale), sale => sale is Sale && CanEditSale);
             ViewSaleDetailsCommand = new RelayCommand(sale => ToggleSaleDetails(sale as Sale), sale => sale is Sale);
             DeleteSaleCommand = new RelayCommand(sale => DeleteSaleAsync(sale as Sale), sale => sale is Sale);
 
             _context = context;
             LoadSales();
+            _parentWindow = parentWindow;
         }
 
         private void CreateSale()
         {
-            var window = new SaleCreateEditWindow(_context, _mainViewModel);
+            var window = new SaleCreateEditWindow(_context, _mainViewModel, _closeAction);
+            var vm = new SaleCreateEditViewModel(_context, _mainViewModel, () => window.Close(), window);
+            window.DataContext = vm;
             window.ShowDialog();
             LoadSales();
         }
@@ -170,15 +174,6 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                 MessageBox.Show($"Ошибка при удалении: {ex.Message}",
                     "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private void EditSale(Sale sale)
-        {
-            if (sale == null || !CanEditSale) return;
-
-            var window = new SaleCreateEditWindow(_context, _mainViewModel, sale);
-            window.ShowDialog();
-            LoadSales();
         }
 
         private void ToggleSaleDetails(Sale sale)

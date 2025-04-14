@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:recipesvm="clr-namespace:App_Automatize_Backery.ViewModels.RecipesVM" d:DataContext="{d:DesignInstance Type=recipesvm:RecipesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{DynamicResource MaterialDesignPaper}">
@@ -15,20 +15,28 @@
         </Grid.RowDefinitions>
 
         <!-- Заголовок и кнопка -->
-        <DockPanel Grid.Row="0" Margin="460,0,0,16">
+        <DockPanel Grid.Row="0" Margin="450,0,0,16">
             <TextBlock Text="Список рецептов:"
                        FontSize="28"
                        FontWeight="Bold"
                        Foreground="{DynamicResource PrimaryHueMidBrush}" />
-            <Button Command="{Binding CreateRecipeCommand}"
+            <Button Command="{Binding CreateRecipeCommand}" Visibility="{Binding DataContext.TechnologistVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Style="{StaticResource MaterialDesignFlatButton}"
-                    Margin="150,0,0,0" Width="180"
+                    Margin="0,0,150,0" Width="180"
                     VerticalAlignment="Center"
                     DockPanel.Dock="Right"
                     Padding="12,6">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="PlusCircleOutline" Margin="0,0,6,0"/>
                     <TextBlock Text="Создать рецепт" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding ShowArchiveCommand}" Style="{StaticResource MaterialDesignFlatButton}" 
+                    DockPanel.Dock="Right" Margin="0 0 -700 0"
+                    VerticalAlignment="Center" Width="150">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ArchiveEye" Margin="0,0,6,0"/>
+                    <TextBlock Text="{Binding IsArchiveVisible, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Архив;Список активных'}" />
                 </StackPanel>
             </Button>
         </DockPanel>
@@ -39,7 +47,7 @@
                   SelectedItem="{Binding SelectedRecipe}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  RowHeight="80"
+                  RowHeight="80" Height="300"
                   MaxHeight="300"
                   Style="{StaticResource MaterialDesignDataGrid}"
                   Margin="0,5,0,10">
@@ -58,30 +66,65 @@
                 <DataGridTemplateColumn Header="Действия" Width="2*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                <Button Content="Просмотреть"
+                            <StackPanel x:Name="main" Orientation="Horizontal" HorizontalAlignment="Left" >
+                                <Button 
                                         Command="{Binding DataContext.ViewRecipeDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}" 
-                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                        ToolTip="Просмотреть технологическую карту"
+                                        Style="{StaticResource MaterialDesignFlatButton}">
+                                    <materialDesign:PackIcon Kind="Eye" Width="20" Height="20"/>
+                                </Button>
 
-                                <Button Content="Редактировать"
+                                <Button
                                         Command="{Binding DataContext.EditRecipeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"
+                                        ToolTip="Редактировать рецепт"
+                                        Visibility="{Binding DataContext.TechnologistVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         Style="{StaticResource MaterialDesignFlatButton}"
-                                        Margin="5,0"/>
+                                        Margin="5,0">
+                                    <materialDesign:PackIcon Kind="Edit" Width="20" Height="20"/>
+                                </Button>
 
-                                <Button Content="Удалить"
+                                <Button
                                         Command="{Binding DataContext.DeleteRecipeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"
-                                        Style="{StaticResource MaterialDesignFlatButton}"
-                                        Foreground="Red" />
+                                        ToolTip="Удалить рецепт"
+                                        Visibility="{Binding DataContext.TechnologistVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        Style="{StaticResource MaterialDesignFlatButton}">
+                                    <materialDesign:PackIcon Kind="Delete" Width="20" Height="20"/>
+                                </Button>
+                                <Button Margin="20 0 0 0"
+                                        Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" 
+                                        Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                    <Button.Visibility>
+                                        <MultiBinding Converter="{StaticResource TechnologistArchiveVisibilityConverter}" ConverterParameter="Restore">
+                                            <Binding Path="DataContext.IsArchiveVisible" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                            <Binding Path="DataContext.TechnologistVisibility" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                        </MultiBinding>
+                                    </Button.Visibility>
+                                    <materialDesign:PackIcon Kind="Restore" Width="20" Height="20"/>
+                                </Button>
+
+                                <Button Margin="0 0 0 0"
+                                        Command="{Binding DataContext.ArchiveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" 
+                                        Style="{StaticResource MaterialDesignToolButton}">
+                                    <Button.Visibility>
+                                        <MultiBinding Converter="{StaticResource TechnologistArchiveVisibilityConverter}" ConverterParameter="Archive">
+                                            <Binding Path="DataContext.IsArchiveVisible" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                            <Binding Path="DataContext.TechnologistVisibility" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                        </MultiBinding>
+                                    </Button.Visibility>
+                                    <materialDesign:PackIcon Kind="Archive" Width="20" Height="20"/>
+                                </Button>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Separator Margin="0 0 0 -700"/>
+        <Separator Margin="0 0 0 -650"/>
 
         <!-- Контент: ингредиенты рецепта -->
         <ContentControl Grid.Row="2" Content="{Binding CurrentContent}" Margin="0,20,0,0"/>

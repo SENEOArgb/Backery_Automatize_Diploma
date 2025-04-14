@@ -25,19 +25,20 @@ namespace App_Automatize_Backery.ViewModels.RecipesVM
         public string RecipeDescription
         {
             get => _recipeDescription;
-            set { _recipeDescription = value; OnPropertyChanged(nameof(RecipeDescription)); }
+            set { _recipeDescription = value; 
+                OnPropertyChanged(nameof(RecipeDescription)); }
         }
         private string _recipeDescription;
 
         public Product SelectedProduct
         {
             get => _selectedProduct;
-            set { _selectedProduct = value; OnPropertyChanged(nameof(SelectedProduct)); }
+            set { _selectedProduct = value; 
+                OnPropertyChanged(nameof(SelectedProduct)); }
         }
         private Product _selectedProduct;
 
         public ICommand SaveCommand { get; }
-
 
 
         public RecipeCreateEditViewModel(MainViewModel mainVM)
@@ -60,9 +61,14 @@ namespace App_Automatize_Backery.ViewModels.RecipesVM
 
         private void LoadProducts()
         {
-            Products = new ObservableCollection<Product>(App.DbContext.Products.ToList());
+            Products = new ObservableCollection<Product>(
+                App.DbContext.Products
+                    .Where(p => p.StatusProduct != "В архиве")
+                    .ToList());
+
             OnPropertyChanged(nameof(Products));
         }
+
 
         private void Save(object obj)
         {
@@ -83,7 +89,8 @@ namespace App_Automatize_Backery.ViewModels.RecipesVM
                 var recipe = new Recipe
                 {
                     ProductId = SelectedProduct.ProductId,
-                    RecipeDescription = RecipeDescription
+                    RecipeDescription = RecipeDescription,
+                    StatusRecipe = "Активна"
                 };
 
                 App.DbContext.Recipes.Add(recipe);

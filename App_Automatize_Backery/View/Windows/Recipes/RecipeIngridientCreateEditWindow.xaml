@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:App_Automatize_Backery.View.Windows.Recipes" xmlns:recipesvm="clr-namespace:App_Automatize_Backery.ViewModels.RecipesVM" d:DataContext="{d:DesignInstance Type=recipesvm:RMMeasurementUnitRecipeCreateEditViewModel}"
-        mc:Ignorable="d"
-        Title="RecipeIngridientCreateEditWindow" Height="300" Width="450"
+        mc:Ignorable="d" ResizeMode="NoResize"
+        Title="RecipeIngridientCreateEditWindow" Height="310" Width="380"
         Background="{DynamicResource MaterialDesignPaper}">
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -15,25 +15,35 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ComboBox Grid.Row="0" Margin="0,0,0,10"
+        <!-- Сырьё -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Сырьё:" Margin="0,0,0,2" />
+            <ComboBox
                   ItemsSource="{Binding RawMaterials}"
                   SelectedItem="{Binding Ingredient.RawMaterial}"
                   DisplayMemberPath="RawMaterialName"
-                  ToolTip="Сырье"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
+        </StackPanel>
 
-        <ComboBox Grid.Row="1" Margin="0,0,0,10"
+        <!-- Единицы измерения -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Единица измерения:" Margin="0,0,0,2" />
+            <ComboBox
                   ItemsSource="{Binding MeasurementUnits}"
                   SelectedItem="{Binding Ingredient.MeasurementUnit}"
                   DisplayMemberPath="MeasurementUnitName"
-                  ToolTip="Ед. измерения"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
+        </StackPanel>
 
-        <TextBox Grid.Row="2" Margin="0,0,0,20"
+        <!-- Количество -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,20">
+            <TextBlock Text="Количество:" Margin="0,0,0,2" />
+            <TextBox
                  Text="{Binding Ingredient.CountRawMaterial}"
-                 ToolTip="Количество"
                  Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+        </StackPanel>
 
+        <!-- Кнопки -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Отмена" Margin="0,0,10,0"
                     Command="{Binding CancelCommand}"

@@ -94,7 +94,30 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel.SupplyRequest
             var currentUser = VmMain.CurrentUser;
             if (currentUser == null)
             {
-                MessageBox.Show("Пользователь не авторизован!");
+                MessageBox.Show("Пользователь не авторизован!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Валидация статуса
+            if (SelectedStatus == null)
+            {
+                MessageBox.Show("Выберите статус заявки.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Валидация даты
+            if (SupplyRequestDate < DateTime.Today)
+            {
+                MessageBox.Show("Дата заявки не может быть в прошлом.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Валидация: не более одной заявки от пользователя в день (опционально)
+            var existingRequestToday = App.DbContext.SupplyRequests
+                .Any(sr => sr.UserId == currentUser.UserId && sr.SupplyRequestDate.Date == SupplyRequestDate.Date);
+            if (existingRequestToday)
+            {
+                MessageBox.Show("Вы уже создавали заявку на эту дату.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

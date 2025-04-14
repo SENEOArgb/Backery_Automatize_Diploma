@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace App_Automatize_Backery.Models;
@@ -14,6 +13,8 @@ public partial class Product
     public int? TypeProductId { get; set; }
 
     public decimal ProductCoast { get; set; }
+
+    public string? StatusProduct { get; set; }
 
     public virtual ICollection<RawMaterialsWarehousesProduct> RawMaterialsWarehousesProducts { get; set; } = new List<RawMaterialsWarehousesProduct>();
 

@@ -1,5 +1,6 @@
 ﻿using App_Automatize_Backery.Models;
 using App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM;
+using App_Automatize_Backery.ViewModels.SupportViewModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace App_Automatize_Backery.Helper
     public class StockService
     {
         private readonly MinBakeryDbContext _context;
-
+        private PWarehouseViewModel rmwpVm;
         public StockService(MinBakeryDbContext context)
         {
             _context = context;
@@ -57,7 +58,7 @@ namespace App_Automatize_Backery.Helper
                 );
 
                 var stockItems = await _context.RawMaterialsWarehousesProducts
-                    .Where(r => r.RawMaterialId == required.RawMaterialMeasurementUnitRecipe.RawMaterialId)
+                    .Where(r => r.RawMaterialId == required.RawMaterialMeasurementUnitRecipe.RawMaterialId && r.WarehouseId == 2)
                     .OrderBy(r => r.RawMaterialCount)
                     .ToListAsync();
 
@@ -84,6 +85,7 @@ namespace App_Automatize_Backery.Helper
                     }
 
                     _context.RawMaterialsWarehousesProducts.Update(stock);
+                    //rmwpVm.LoadProducts();
                 }
             }
 
@@ -117,7 +119,7 @@ namespace App_Automatize_Backery.Helper
                 {
                     ProductId = productId,
                     RawMaterialCount = quantity,
-                    WarehouseId = warehouseId,
+                    WarehouseId = 2,
                     DateSupplyOrProduction = currentDateTime  // Записываем текущее время
                 });
             }
@@ -215,6 +217,7 @@ namespace App_Automatize_Backery.Helper
                 {
                     await AddFinishedProductAsync(productId, count, warehouseId: 1);
                 }
+
 
                 await transaction.CommitAsync();
                 Debug.WriteLine("[SUCCESS] Склад обновлен!");

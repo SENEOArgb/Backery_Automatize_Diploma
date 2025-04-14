@@ -57,12 +57,28 @@ namespace App_Automatize_Backery.ViewModels.Новая_папка
         {
             return !string.IsNullOrWhiteSpace(RawMaterial.RawMaterialName) &&
                    RawMaterial.RawMaterialCoast > 0 &&
-                   RawMaterial.MeasurementUnitId > 0;
+                   RawMaterial.MeasurementUnitId > 0 &&
+                   RawMaterial.ShelfLifeDays > 0;
         }
 
         private void Save()
         {
-            if (IsEditMode)
+            if (!IsEditMode)
+            {
+                // Проверка на дубликат названия
+                var duplicate = App.DbContext.RawMaterials
+                    .Any(r => r.RawMaterialName.ToLower() == RawMaterial.RawMaterialName.ToLower() && r.StatusRawMaterial != "Удалена");
+
+                if (duplicate)
+                {
+                    System.Windows.MessageBox.Show("Сырьё с таким названием уже существует.", "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
+                RawMaterial.StatusRawMaterial = "Активна";
+                App.DbContext.RawMaterials.Add(RawMaterial);
+            }
+            else
             {
                 var existingMaterial = App.DbContext.RawMaterials.Find(RawMaterial.RawMaterialId);
                 if (existingMaterial != null)
@@ -71,12 +87,8 @@ namespace App_Automatize_Backery.ViewModels.Новая_папка
                     existingMaterial.ShelfLifeDays = RawMaterial.ShelfLifeDays;
                     existingMaterial.RawMaterialCoast = RawMaterial.RawMaterialCoast;
                     existingMaterial.MeasurementUnitId = RawMaterial.MeasurementUnitId;
+                    App.DbContext.RawMaterials.Update(existingMaterial);
                 }
-                App.DbContext.RawMaterials.Update(existingMaterial);
-            }
-            else
-            {
-                App.DbContext.RawMaterials.Add(RawMaterial);
             }
 
             App.DbContext.SaveChanges();

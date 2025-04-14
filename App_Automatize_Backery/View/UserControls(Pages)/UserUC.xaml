@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+             xmlns:local="clr-namespace:App_Automatize_Backery.View.UserControls_Pages_" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:viewmodels="clr-namespace:App_Automatize_Backery.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <Grid Margin="20">
@@ -28,7 +28,7 @@
                 </Grid>
 
                 <Button Content="Задать норму" Command="{Binding SetDailyNormCommand}" Margin="0 50 0 0" Background="MidnightBlue" Width="140" 
-                        Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="White" Visibility="{Binding TechnologistVisibility}"/>
+                        Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="White" Visibility="{Binding ManagerMenuVisibility}"/>
                 <Separator Margin="0 50 0 0"/>
 
                 <TextBlock Text="Рабочий день: 8:00 - 21:00" Margin="0 30 0 0" FontSize="18"/>

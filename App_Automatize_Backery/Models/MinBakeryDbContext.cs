@@ -167,6 +167,9 @@ public partial class MinBakeryDbContext : DbContext
             entity.Property(e => e.ProductName)
                 .HasMaxLength(150)
                 .HasColumnName("productName");
+            entity.Property(e => e.StatusProduct)
+                .HasMaxLength(150)
+                .HasColumnName("statusProduct");
             entity.Property(e => e.TypeProductId).HasColumnName("typeProductId");
 
             entity.HasOne(d => d.TypeProduct).WithMany(p => p.Products)
@@ -215,6 +218,9 @@ public partial class MinBakeryDbContext : DbContext
                 .HasMaxLength(150)
                 .HasColumnName("rawMaterialName");
             entity.Property(e => e.ShelfLifeDays).HasColumnName("shelfLifeDays");
+            entity.Property(e => e.StatusRawMaterial)
+                .HasMaxLength(150)
+                .HasColumnName("statusRawMaterial");
 
             entity.HasOne(d => d.MeasurementUnit).WithMany(p => p.RawMaterials)
                 .HasForeignKey(d => d.MeasurementUnitId)
@@ -287,6 +293,9 @@ public partial class MinBakeryDbContext : DbContext
             entity.Property(e => e.RecipeId).HasColumnName("recipeID");
             entity.Property(e => e.ProductId).HasColumnName("productId");
             entity.Property(e => e.RecipeDescription).HasColumnName("recipeDescription");
+            entity.Property(e => e.StatusRecipe)
+                .HasMaxLength(150)
+                .HasColumnName("statusRecipe");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Recipes)
                 .HasForeignKey(d => d.ProductId)

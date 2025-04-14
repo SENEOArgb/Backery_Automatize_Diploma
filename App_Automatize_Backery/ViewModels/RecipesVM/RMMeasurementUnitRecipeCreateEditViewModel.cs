@@ -28,7 +28,7 @@ namespace App_Automatize_Backery.ViewModels.RecipesVM
         {
             Ingredient = ingredient;
 
-            RawMaterials = new ObservableCollection<RawMaterial>(App.DbContext.RawMaterials.ToList());
+            RawMaterials = new ObservableCollection<RawMaterial>(App.DbContext.RawMaterials.Where(r => r.StatusRawMaterial != "В архиве").ToList());
             MeasurementUnits = new ObservableCollection<MeasurementUnit>(App.DbContext.MeasurementUnits.ToList());
 
             SaveCommand = new RelayCommand(Save);

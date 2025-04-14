@@ -15,6 +15,8 @@ public partial class RawMaterial
 
     public decimal RawMaterialCoast { get; set; }
 
+    public string? StatusRawMaterial { get; set; }
+
     public virtual MeasurementUnit MeasurementUnit { get; set; } = null!;
 
     public virtual ICollection<RawMaterialMeasurementUnitRecipe> RawMaterialMeasurementUnitRecipes { get; set; } = new List<RawMaterialMeasurementUnitRecipe>();

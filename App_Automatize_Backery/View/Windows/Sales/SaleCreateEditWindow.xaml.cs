@@ -22,16 +22,36 @@ namespace App_Automatize_Backery.View.Windows.Sales
     /// </summary>
     public partial class SaleCreateEditWindow : Window
     {
-        public SaleCreateEditWindow(MinBakeryDbContext context, MainViewModel mainViewModel)
+        public SaleCreateEditWindow(MinBakeryDbContext context, MainViewModel mainViewModel, Action action)
         {
             InitializeComponent();
-            this.DataContext = new SaleCreateEditViewModel(context, mainViewModel);
+            this.DataContext = new SaleCreateEditViewModel(context, mainViewModel, action, this);
         }
 
-        public SaleCreateEditWindow(MinBakeryDbContext context, MainViewModel mainViewModel, Sale? sale )
-            : this(context, mainViewModel) // Передаем mainViewModel
+        public SaleCreateEditWindow(MinBakeryDbContext context, MainViewModel mainViewModel,Action action, Sale? sale )
+            : this(context, mainViewModel, action) // Передаем mainViewModel
         {
-            this.DataContext = new SaleCreateEditViewModel(context, mainViewModel, sale);
+            this.DataContext = new SaleCreateEditViewModel(context, mainViewModel, action,this, sale);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            DatePickerControl.DisplayDateStart = DateTime.Today;
+            DatePickerControl.DisplayDateEnd = DateTime.Today.AddDays(7);
+        }
+
+        private void selTime_SelectedTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            if (selTime.SelectedTime.HasValue)
+            {
+                var selectedTime = selTime.SelectedTime.Value.TimeOfDay;
+
+                if (selectedTime < TimeSpan.FromHours(8) || selectedTime > TimeSpan.FromHours(21))
+                {
+                    MessageBox.Show("Выберите время между 08:00 и 21:00.", "Недопустимое время", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    selTime.SelectedTime = null;
+                }
+            }
         }
     }
 }
