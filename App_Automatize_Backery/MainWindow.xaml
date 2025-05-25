@@ -88,7 +88,7 @@
                         <TextBlock Text="Продажи"/>
                     </StackPanel>
                 </Button>
-                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowReportsCommand}" Visibility="{Binding ManagerMenuVisibility}">
+                <Button Height="50" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Command="{Binding ShowReportsCommand}" Visibility="{Binding ReportsVisibility}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="FileDocument" Margin="0,0,10,0"/>
                         <TextBlock Text="Отчёты"/>

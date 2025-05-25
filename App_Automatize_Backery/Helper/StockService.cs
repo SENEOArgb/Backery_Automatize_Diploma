@@ -119,7 +119,7 @@ namespace App_Automatize_Backery.Helper
                 {
                     ProductId = productId,
                     RawMaterialCount = quantity,
-                    WarehouseId = 2,
+                    WarehouseId = 1,
                     DateSupplyOrProduction = currentDateTime  // Записываем текущее время
                 });
             }
@@ -180,7 +180,7 @@ namespace App_Automatize_Backery.Helper
                 if (productId == null) continue;
 
                 var productStockItems = _context.RawMaterialsWarehousesProducts
-                    .Where(p => p.ProductId == productId && p.WarehouseId == 2) // Убираем только с нужного склада
+                    .Where(p => p.ProductId == productId && p.WarehouseId == 1) // Убираем только с нужного склада
                     .OrderBy(p => p.RawMaterialCount) // Убираем сначала с наименьших остатков
                     .ToList();
 

@@ -88,7 +88,7 @@ namespace App_Automatize_Backery.ViewModels
             }
         }
 
-        private void OpenAddRawMaterialWindow(object obj)
+        private async void OpenAddRawMaterialWindow(object obj)
         {
             if (CanAddRawMaterial)
             {
@@ -97,7 +97,7 @@ namespace App_Automatize_Backery.ViewModels
                 window.DataContext = viewModel;
                 window.ShowDialog();
                 UpdateTotalSalary();// Update list after adding
-                LoadSupplyRequestRawMaterials();
+                await LoadSupplyRequestRawMaterials();
             }
         }
 

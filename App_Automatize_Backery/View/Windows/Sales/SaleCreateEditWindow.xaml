@@ -42,11 +42,12 @@
 
         <!-- Тип продажи -->
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Тип продажи:" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="1" Grid.Column="1"
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="cbSaleType"
                   ItemsSource="{Binding SaleTypes}" 
                   SelectedItem="{Binding SelectedSaleType, UpdateSourceTrigger=PropertyChanged}"
                   Style="{StaticResource MaterialDesignComboBox}" 
-                  Width="250" Margin="0,5"/>
+                  Width="250" Margin="0,5"
+                  SelectionChanged="cbSaleType_SelectionChanged"/>
 
         <!-- Дата продажи -->
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Дата:" VerticalAlignment="Center"/>

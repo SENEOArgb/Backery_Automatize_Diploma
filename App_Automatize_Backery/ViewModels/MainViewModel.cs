@@ -5,8 +5,10 @@ using App_Automatize_Backery.View.UserControls_Pages_;
 using App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages;
 using App_Automatize_Backery.View.UserControls_Pages_.WorkerManufactury;
 using App_Automatize_Backery.View.Windows;
+using App_Automatize_Backery.View.Windows.RPP;
 using App_Automatize_Backery.View.Windows.Sales;
 using App_Automatize_Backery.ViewModels.ProductionsVM;
+using App_Automatize_Backery.ViewModels.ProductionsVM.SupportVM;
 using App_Automatize_Backery.ViewModels.RecipesVM;
 using App_Automatize_Backery.ViewModels.ReportsVM;
 using App_Automatize_Backery.ViewModels.SalesVM;
@@ -23,8 +25,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using Xceed.Words.NET;
+using System.Drawing;
+using System.Drawing.Imaging;
 using SupplyRequestsUC = App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages.SupplyRequestsUC;
+using Xceed.Document.NET;
 
 namespace App_Automatize_Backery.ViewModels
 {
@@ -60,6 +68,8 @@ namespace App_Automatize_Backery.ViewModels
         public Visibility SalesVisibility => IsTechnolog ? Visibility.Collapsed : Visibility.Visible;
         public Visibility SupplyVisibility => IsTechnolog ? Visibility.Collapsed : Visibility.Visible;
         public Visibility ProductionVisibility => IsTechnolog ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ReportsVisibility =>
+    (IsManager || IsWorker) ? Visibility.Visible : Visibility.Collapsed;
 
         public User CurrentUser { get; set; }  // Новое свойство для текущего пользователя
 
@@ -156,7 +166,7 @@ namespace App_Automatize_Backery.ViewModels
                 try
                 {
                     var warehouseUC = new WarehouseUC();
-                    warehouseUC.DataContext = new WarehouseViewModel(); // Привязка ViewModel
+                    warehouseUC.DataContext = new WarehouseViewModel(this); // Привязка ViewModel
                     CurrentView = warehouseUC;
                 }
                 catch (Exception ex)
@@ -231,6 +241,8 @@ namespace App_Automatize_Backery.ViewModels
                     Console.WriteLine($"Ошибка при отображении ReportUC: {ex.Message}");
                 }
             });
+
+            CreateReportRPP = new RelayCommand(_ => OpenRPPWindow());
         }
 
         private void Logout(object obj)
@@ -335,28 +347,19 @@ namespace App_Automatize_Backery.ViewModels
             get => _dailyCompletion;
             set
             {
-                if (_dailyCompletion != value)
+                double limitedValue = Math.Min(value, 100); // Ограничиваем значение максимум 100%
+                if (Math.Abs(_dailyCompletion - limitedValue) > 0.01)
                 {
-                    _dailyCompletion = value;
-                    OnPropertyChanged(nameof(DailyCompletion));
+                    _dailyCompletion = limitedValue;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(DailyCompletionText)); // Обновляем текст
                 }
             }
         }
 
         // Текст для отображения статуса выполнения
         private string _dailyCompletionText;
-        public string DailyCompletionText
-        {
-            get => _dailyCompletionText;
-            set
-            {
-                if (_dailyCompletionText != value)
-                {
-                    _dailyCompletionText = value;
-                    OnPropertyChanged(nameof(DailyCompletionText));
-                }
-            }
-        }
+        public string DailyCompletionText => $"{DailyCompletion:F2}%";
 
         private void UpdateCompletion()
         {
@@ -368,16 +371,14 @@ namespace App_Automatize_Backery.ViewModels
                 // Процент выполнения нормы на основе проданных изделий
                 double salesProgress = DailyProduction > 0 ? (double)DailySale / DailyProduction * 100 : 0;
 
-                // Финальный процент выполнения нормы — это среднее значение из этих двух
-                double completion = Math.Min(productionProgress, salesProgress); // Не может быть больше 100%
+                // Финальный процент выполнения нормы — это минимум из этих двух
+                double completion = Math.Min(productionProgress, salesProgress);
 
                 DailyCompletion = completion;
-                DailyCompletionText = $"{DailyCompletion:F2}%";
             }
             else
             {
                 DailyCompletion = 0;
-                DailyCompletionText = "Норма не установлена";
             }
         }
 
@@ -449,6 +450,341 @@ namespace App_Automatize_Backery.ViewModels
         {
             _config.SavedDailyNorm = DailyNorm;
             File.WriteAllText(_configPath, JsonConvert.SerializeObject(_config));
+        }
+
+        ///////////////////////////
+
+        public ICommand CreateReportRPP { get; }
+
+        private void OpenRPPWindow()
+        {
+            var window = new CreateRPPWindow
+            {
+                DataContext = new CreateRPPViewModel(this)
+            };
+            window.ShowDialog();
+        }
+
+        public void GenerateRPPReport(DateTime from, DateTime to)
+        {
+            var supplies = _context.SupplyRequests
+                .Include(s => s.SupplyRequestsRawMaterials)
+                .Where(s => s.SupplyRequestDate >= from && s.SupplyRequestDate <= to)
+                .ToList();
+
+            var sales = _context.Sales
+                .Include(s => s.SaleProducts)
+                .ThenInclude(sp => sp.Product)
+                .Where(s => s.DateTimeSale >= from && s.DateTimeSale <= to)
+                .ToList();
+
+            var productions = _context.Productions
+                .Include(p => p.ProductionsRawMaterialsMeasurementUnitRecipes)
+                    .ThenInclude(pr => pr.RawMaterialMeasurementUnitRecipe)
+                .Include(p => p.ProductionsRawMaterialsMeasurementUnitRecipes)
+                    .ThenInclude(pr => pr.RawMaterialMeasurementUnitRecipe)
+                        .ThenInclude(r => r.RawMaterial)
+                        .ThenInclude(r => r.MeasurementUnit)
+                .Include(p => p.ProductionsRawMaterialsMeasurementUnitRecipes)
+                    .ThenInclude(pr => pr.RawMaterialMeasurementUnitRecipe)
+                        .ThenInclude(r => r.Recipe)
+                        .ThenInclude(r => r.Product)
+                .Where(p => p.DateTimeStart >= from && p.DateTimeStart <= to)
+                .ToList();
+
+            // 1. Суммарные значения
+            decimal totalExpenses = supplies.Sum(s => s.SupplyRequestsRawMaterials.Sum(rm => rm.SupplyCoastToMaterial));
+            decimal totalIncome = sales.Sum(s => s.CoastSale ?? 0m);
+            int totalProduced = productions
+                .SelectMany(p => p.ProductionsRawMaterialsMeasurementUnitRecipes
+                    .GroupBy(r => r.RawMaterialMeasurementUnitRecipe.Recipe.RecipeId)
+                    .Select(g => g.First().CountProduct))
+                .Sum();
+            int totalSold = sales.Sum(s => s.SaleProducts.Sum(p => p.CountProductSale));
+            int unsold = totalProduced - totalSold;
+
+            // Чистая прибыль (с учётом "потери" из-за нереализованной продукции)
+            decimal lostProfit = 0m;
+            decimal netProfit = 0m;
+
+            try
+            {
+                decimal unitCost = productions
+                    .SelectMany(p => p.ProductionsRawMaterialsMeasurementUnitRecipes)
+                    .Where(r => r?.RawMaterialMeasurementUnitRecipe?.Recipe?.Product != null)
+                    .Select(r => r.RawMaterialMeasurementUnitRecipe.Recipe.Product.ProductCoast)
+                    .FirstOrDefault();
+                lostProfit = unitCost * unsold;
+                netProfit = totalIncome - totalExpenses - lostProfit;
+            }
+            catch { }
+
+            var conversions = _context.MeasurementConversions
+                .ToList()
+                .ToDictionary(c => (From: c.FromMeasureUnitId, To: c.ToMeasureUnitId), c => c.ConversionFactor);
+
+            // Таблицы:
+            var soldProductsGrouped = sales
+                .SelectMany(s => s.SaleProducts)
+                .GroupBy(sp => sp.Product)
+                .Select(g => new
+                {
+                    Product = g.Key,
+                    Count = g.Sum(p => p.CountProductSale),
+                    Total = g.Sum(p => p.CountProductSale * (p.Product.ProductCoast))
+                }).ToList();
+
+            var producedProductsGrouped = productions
+                .Select(p => new
+                {
+                    Product = p.ProductionsRawMaterialsMeasurementUnitRecipes
+                        .First().RawMaterialMeasurementUnitRecipe.Recipe.Product,
+                    Count = p.ProductionsRawMaterialsMeasurementUnitRecipes
+                        .First().CountProduct,
+                    Total = p.ProductionsRawMaterialsMeasurementUnitRecipes
+                        .First().CountProduct *
+                            p.ProductionsRawMaterialsMeasurementUnitRecipes
+                            .First().RawMaterialMeasurementUnitRecipe.Recipe.Product.ProductCoast
+                })
+                .GroupBy(x => x.Product)
+                .Select(g => new
+                {
+                    Product = g.Key,
+                    Count = g.Sum(x => x.Count),
+                    Total = g.Sum(x => x.Total)
+                }).ToList();
+
+
+            var unsoldProducts = producedProductsGrouped
+                .GroupJoin(soldProductsGrouped,
+                    prod => prod.Product.ProductId,
+                    sold => sold.Product.ProductId,
+                    (prod, soldGroup) =>
+                    {
+                        var sold = soldGroup.FirstOrDefault();
+                        int soldCount = sold?.Count ?? 0;
+                        int unsoldCount = prod.Count - soldCount;
+                        decimal unsoldValue = unsoldCount * (prod.Product.ProductCoast);
+                        return new
+                        {
+                            Product = prod.Product,
+                            Count = unsoldCount,
+                            Total = unsoldValue
+                        };
+                    })
+                .Where(x => x.Count > 0)
+                .ToList();
+
+            // Даты
+            var supplyDates = supplies.Select(s => s.SupplyRequestDate.Date);
+            var saleDates = sales.Select(s => s.DateTimeSale.Date);
+            var allDates = supplyDates.Union(saleDates).Distinct().OrderBy(d => d).ToList();
+
+            var dataByDay = allDates.ToDictionary(
+                date => date,
+                date => (
+                    Income: sales.Where(s => s.DateTimeSale.Date == date).Sum(s => s.CoastSale ?? 0m),
+                    Expenses: supplies.Where(s => s.SupplyRequestDate.Date == date).Sum(s => s.SupplyRequestsRawMaterials.Sum(rm => rm.SupplyCoastToMaterial))
+                )
+            );
+
+            // Генерация Word-отчета
+            var reportsDirectory = @"D:\ДИПЛОМ\ARM_Proj\Backery_Automatize\App_Automatize_Backery\reports";
+            Directory.CreateDirectory(reportsDirectory);
+            var path = Path.Combine(reportsDirectory, $"RPP_Report_{from:yyyyMMdd}_{to:yyyyMMdd}.docx");
+
+            using (var doc = DocX.Create(path))
+            {
+                doc.InsertParagraph($"📅 Отчёт по производству и продажам с {from:dd.MM.yyyy} по {to:dd.MM.yyyy}").FontSize(16).Bold().SpacingAfter(20);
+
+                doc.InsertParagraph($"💰 Общий доход: {totalIncome:F2} руб.");
+                doc.InsertParagraph($"💸 Общие расходы: {totalExpenses:F2} руб.");
+                doc.InsertParagraph($"🧾 Чистая прибыль: {netProfit:F2} руб.");
+                doc.InsertParagraph($"🏭 Произведено: {totalProduced} шт.");
+                doc.InsertParagraph($"🛒 Продано: {totalSold} шт.");
+                doc.InsertParagraph($"📦 Осталось на складе: {unsold} шт.");
+                doc.InsertParagraph("");
+
+                // Таблица: Проданные изделия
+                doc.InsertParagraph("📊 Проданные изделия:").Bold();
+                var soldTable = doc.AddTable(soldProductsGrouped.Count + 1, 3);
+                soldTable.Design = TableDesign.LightShadingAccent1;
+                soldTable.Rows[0].Cells[0].Paragraphs[0].Append("Изделие");
+                soldTable.Rows[0].Cells[1].Paragraphs[0].Append("Количество");
+                soldTable.Rows[0].Cells[2].Paragraphs[0].Append("Сумма");
+
+                for (int i = 0; i < soldProductsGrouped.Count; i++)
+                {
+                    soldTable.Rows[i + 1].Cells[0].Paragraphs[0].Append(soldProductsGrouped[i].Product.ProductName);
+                    soldTable.Rows[i + 1].Cells[1].Paragraphs[0].Append(soldProductsGrouped[i].Count.ToString());
+                    soldTable.Rows[i + 1].Cells[2].Paragraphs[0].Append($"{soldProductsGrouped[i].Total:F2} руб.");
+                }
+                doc.InsertTable(soldTable);
+                doc.InsertParagraph();
+
+                // Таблица: Произведённые изделия
+                doc.InsertParagraph("🏭 Произведённые изделия:").Bold();
+                var producedTable = doc.AddTable(producedProductsGrouped.Count + 1, 3);
+                producedTable.Design = TableDesign.LightList;
+                producedTable.Rows[0].Cells[0].Paragraphs[0].Append("Изделие");
+                producedTable.Rows[0].Cells[1].Paragraphs[0].Append("Количество");
+                producedTable.Rows[0].Cells[2].Paragraphs[0].Append("Сумма");
+
+                for (int i = 0; i < producedProductsGrouped.Count; i++)
+                {
+                    producedTable.Rows[i + 1].Cells[0].Paragraphs[0].Append(producedProductsGrouped[i].Product.ProductName);
+                    producedTable.Rows[i + 1].Cells[1].Paragraphs[0].Append(producedProductsGrouped[i].Count.ToString());
+                    producedTable.Rows[i + 1].Cells[2].Paragraphs[0].Append($"{producedProductsGrouped[i].Total:F2} руб.");
+                }
+                doc.InsertTable(producedTable);
+                doc.InsertParagraph();
+
+                // Таблица: Непроданные изделия
+                doc.InsertParagraph("📦 Непроданные изделия:").Bold();
+                var unsoldTable = doc.AddTable(unsoldProducts.Count + 1, 3);
+                unsoldTable.Design = TableDesign.ColorfulGrid;
+                unsoldTable.Rows[0].Cells[0].Paragraphs[0].Append("Изделие");
+                unsoldTable.Rows[0].Cells[1].Paragraphs[0].Append("Количество");
+                unsoldTable.Rows[0].Cells[2].Paragraphs[0].Append("Сумма");
+
+                for (int i = 0; i < unsoldProducts.Count; i++)
+                {
+                    unsoldTable.Rows[i + 1].Cells[0].Paragraphs[0].Append(unsoldProducts[i].Product.ProductName);
+                    unsoldTable.Rows[i + 1].Cells[1].Paragraphs[0].Append(unsoldProducts[i].Count.ToString());
+                    unsoldTable.Rows[i + 1].Cells[2].Paragraphs[0].Append($"{unsoldProducts[i].Total:F2} руб.");
+                }
+                doc.InsertTable(unsoldTable);
+                doc.InsertParagraph();
+
+                // Диаграмма
+                var chartImageStream = GenerateChart(dataByDay);
+                var chartImage = doc.AddImage(chartImageStream);
+                var picture = chartImage.CreatePicture();
+                picture.Width = 500;
+                picture.Height = 300;
+
+                doc.InsertParagraph("📊 Диаграмма доходов и расходов по дням").SpacingBefore(20);
+                doc.InsertParagraph().AppendPicture(picture);
+
+                doc.Save();
+            }
+
+            // Сохранение отчета в БД
+            var report = new Report
+            {
+                UserId = CurrentUser.UserId,
+                ReportType = $"РПП за период с {from:dd.MM.yyyy} по {to:dd.MM.yyyy}",
+                ReportDate = DateTime.Now
+            };
+            App.DbContext.Reports.Add(report);
+            App.DbContext.SaveChanges();
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при открытии отчета: {ex.Message}");
+            }
+
+            MessageBox.Show($"Отчёт успешно сохранён:\n{path}", "Отчёт", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private MemoryStream GenerateChart(Dictionary<DateTime, (decimal Income, decimal Expenses)> dataByDate)
+        {
+            int width = 900;
+            int height = 500;
+            var bitmap = new Bitmap(width, height);
+            var g = Graphics.FromImage(bitmap);
+            g.Clear(System.Drawing.Color.White);
+
+            var font = new System.Drawing.Font("Arial", 10);
+            var brush = System.Drawing.Brushes.Black;
+            var penIncome = new System.Drawing.Pen(System.Drawing.Color.Green, 2);
+            var penExpenses = new System.Drawing.Pen(System.Drawing.Color.Red, 2);
+
+            int marginLeft = 80;
+            int marginRight = 40;
+            int marginTop = 40;
+            int marginBottom = 100;
+
+            int chartWidth = width - marginLeft - marginRight;
+            int chartHeight = height - marginTop - marginBottom;
+
+            var dates = dataByDate.Keys.OrderBy(d => d).ToList();
+
+            if (dates.Count < 2)
+            {
+                g.DrawString("Недостаточно данных для построения графика", font, brush, 100, height / 2);
+            }
+            else
+            {
+                decimal maxValue = Math.Max(1, dataByDate.Values.SelectMany(v => new[] { v.Income, v.Expenses }).Max());
+
+                // Оси
+                g.DrawLine(Pens.Black, marginLeft, marginTop, marginLeft, height - marginBottom); // ось Y
+                g.DrawLine(Pens.Black, marginLeft, height - marginBottom, width - marginRight, height - marginBottom); // ось X
+
+                // Подпись к оси Y (вертикальная, левее и выше)
+                g.TranslateTransform(-2, height / 2); // Левее (5 вместо 20) и выше
+                g.RotateTransform(-90);
+                g.DrawString("Сумма, руб.", font, brush, 0, 0);
+                g.ResetTransform();
+
+                // Подпись к оси X
+                g.DrawString("Дата", font, brush, width / 2 - 20, height - marginBottom + 80);
+
+                // Деления и подписи по Y
+                for (int i = 0; i <= 5; i++)
+                {
+                    decimal val = maxValue * i / 5;
+                    int y = height - marginBottom - (int)(val / maxValue * chartHeight);
+                    var valStr = val.ToString("0.##");
+                    var valSize = g.MeasureString(valStr, font);
+                    g.DrawString(valStr, font, brush, marginLeft - valSize.Width - 5, y - valSize.Height / 2);
+                    g.DrawLine(Pens.LightGray, marginLeft, y, width - marginRight, y);
+                }
+
+                // Деления и подписи по X
+                for (int i = 0; i < dates.Count; i++)
+                {
+                    int x = marginLeft + i * chartWidth / (dates.Count - 1);
+                    g.DrawLine(Pens.Gray, x, height - marginBottom, x, height - marginBottom + 5);
+
+                    // Повернутая подпись
+                    g.TranslateTransform(x - 20, height - marginBottom + 10);
+                    g.RotateTransform(45);
+                    g.DrawString(dates[i].ToShortDateString(), font, brush, 0, 0);
+                    g.ResetTransform();
+                }
+
+                // Точки графиков
+                PointF[] incomePoints = dates.Select((d, i) => new PointF(
+                    marginLeft + i * chartWidth / (dates.Count - 1),
+                    height - marginBottom - (float)(dataByDate[d].Income / maxValue * chartHeight)
+                )).ToArray();
+
+                PointF[] expensePoints = dates.Select((d, i) => new PointF(
+                    marginLeft + i * chartWidth / (dates.Count - 1),
+                    height - marginBottom - (float)(dataByDate[d].Expenses / maxValue * chartHeight)
+                )).ToArray();
+
+                g.DrawLines(penIncome, incomePoints);
+                g.DrawLines(penExpenses, expensePoints);
+
+                // Легенда
+                int legendX = width - 150;
+                g.FillRectangle(System.Drawing.Brushes.Green, legendX, 20, 10, 10);
+                g.DrawString("Доход", font, brush, legendX + 15, 18);
+                g.FillRectangle(System.Drawing.Brushes.Red, legendX, 40, 10, 10);
+                g.DrawString("Расход", font, brush, legendX + 15, 38);
+            }
+
+            var ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Png);
+            ms.Seek(0, SeekOrigin.Begin);
+            return ms;
         }
     }
 }

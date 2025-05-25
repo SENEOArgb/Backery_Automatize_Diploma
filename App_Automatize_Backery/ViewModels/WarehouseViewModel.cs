@@ -18,6 +18,8 @@ namespace App_Automatize_Backery.ViewModels
 {
     public class WarehouseViewModel : INotifyPropertyChanged
     {
+        private MainViewModel _mainViewModel;
+
         private object _currentView;
         public object CurrentView
         {
@@ -69,10 +71,12 @@ namespace App_Automatize_Backery.ViewModels
         private readonly PWarehouseViewModel _productsViewModel;
         private readonly RMWarehouseViewModel _rawMaterialsViewModel;
 
-        public WarehouseViewModel()
+        public WarehouseViewModel(MainViewModel mainViewModel)
         {
+            _mainViewModel = mainViewModel;
+
             _productsViewModel = new PWarehouseViewModel();
-            _rawMaterialsViewModel = new RMWarehouseViewModel();
+            _rawMaterialsViewModel = new RMWarehouseViewModel(_mainViewModel);
 
             ShowProductsCommand = new RelayCommand(o => ShowProductsView());
             ShowRawMaterialsCommand = new RelayCommand(o => ShowRawMaterialsView());
@@ -91,7 +95,7 @@ namespace App_Automatize_Backery.ViewModels
         {
             SelectedTabIndex = 1;
             await _rawMaterialsViewModel.RefreshWarehousesRM();
-            CurrentView = new RawMaterialsWarehouseUC { DataContext = _rawMaterialsViewModel };
+            CurrentView = new RawMaterialsWarehouseUC { DataContext = _rawMaterialsViewModel, };
         }
 
         private void UpdateIndicatorPosition()

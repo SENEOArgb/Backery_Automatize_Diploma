@@ -84,15 +84,6 @@
                                         Margin="5,0">
                                     <materialDesign:PackIcon Kind="Edit" Width="20" Height="20"/>
                                 </Button>
-
-                                <Button
-                                        Command="{Binding DataContext.DeleteRecipeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}"
-                                        ToolTip="Удалить рецепт"
-                                        Visibility="{Binding DataContext.TechnologistVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        Style="{StaticResource MaterialDesignFlatButton}">
-                                    <materialDesign:PackIcon Kind="Delete" Width="20" Height="20"/>
-                                </Button>
                                 <Button Margin="20 0 0 0"
                                         Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}" 

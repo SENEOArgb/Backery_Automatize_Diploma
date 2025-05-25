@@ -36,8 +36,41 @@ namespace App_Automatize_Backery.View.Windows.Sales
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            /*if (cbSaleType.SelectedValue == "Заказ")
+            {
+                DatePickerControl.DisplayDateStart = DateTime.Today;
+                DatePickerControl.DisplayDateEnd = DateTime.Today.AddDays(7);
+            }
+            else
+            {
+                DatePickerControl.DisplayDateStart = DateTime.Today;
+                DatePickerControl.DisplayDateEnd = DateTime.Today;
+            }
+            
             DatePickerControl.DisplayDateStart = DateTime.Today;
-            DatePickerControl.DisplayDateEnd = DateTime.Today.AddDays(7);
+            DatePickerControl.DisplayDateEnd = DateTime.Today.AddDays(7);*/
+
+            cbSaleType_SelectionChanged(null, null);
+        }
+
+        private void cbSaleType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cbSaleType.SelectedItem is string selectedSaleType)
+            {
+                if (selectedSaleType == "Заказ")
+                {
+                    DatePickerControl.DisplayDateStart = DateTime.Today;
+                    DatePickerControl.DisplayDateEnd = DateTime.Today.AddDays(7);
+                    if (DatePickerControl.SelectedDate < DateTime.Today || DatePickerControl.SelectedDate > DateTime.Today.AddDays(7))
+                        DatePickerControl.SelectedDate = DateTime.Today;
+                }
+                else if (selectedSaleType == "Прямая продажа")
+                {
+                    DatePickerControl.DisplayDateStart = DateTime.Today;
+                    DatePickerControl.DisplayDateEnd = DateTime.Today;
+                    DatePickerControl.SelectedDate = DateTime.Today;
+                }
+            }
         }
 
         private void selTime_SelectedTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)

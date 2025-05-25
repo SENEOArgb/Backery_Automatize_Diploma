@@ -62,7 +62,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Наименование" Binding="{Binding RawMaterialName}" Width="300" />
                         <DataGridTextColumn Header="Срок годности,дни" Binding="{Binding ShelfLifeDays, StringFormat={}{0}}" Width="160" />
-                        <DataGridTextColumn Header="Цена,руб." Binding="{Binding RawMaterialCoast, StringFormat={}{0}}" Width="100" />
+                        <DataGridTextColumn Header="Цена,руб." Binding="{Binding RawMaterialCoast, StringFormat={}{0:F2}}" Width="100" />
                         <DataGridTextColumn Header="Ед. измерения" Binding="{Binding MeasurementUnit.MeasurementUnitName}" Width="150" />
 
                         <!-- Кнопка Редактировать -->

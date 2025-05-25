@@ -8,6 +8,14 @@
              d:DesignHeight="600" d:DesignWidth="1000">
     <Grid Margin="10">
         <Button Content="Обновить" Command="{Binding RefreshCommand}" Width="100" Height="40" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -70 0 10"/>
+        <Button x:Name="btnInventory"
+                Content="Провести инвентаризацию"
+                Command="{Binding StartInventoryCommand}"
+                Width="215" Height="40"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Margin="0 -70 120 10"
+                Visibility="{Binding IsInventoryButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <DataGrid ItemsSource="{Binding WarehouseItems}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
@@ -28,7 +36,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Название" Binding="{Binding RawMaterial.RawMaterialName}" Width="*"/>
                 <DataGridTextColumn Header="Количество, кг/л" Binding="{Binding RawMaterialCount, StringFormat={}{0:0.##}}"  Width="*"/>
-                <DataGridTextColumn Header="Поступление" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy HH:mm'}" Width="*"/>
+                <DataGridTextColumn Header="Поступление" Binding="{Binding DateSupplyOrProduction, StringFormat='dd.MM.yyyy'}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

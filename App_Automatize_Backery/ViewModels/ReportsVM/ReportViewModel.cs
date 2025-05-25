@@ -16,6 +16,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages;
+using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace App_Automatize_Backery.ViewModels.ReportsVM
 {
@@ -61,7 +63,9 @@ namespace App_Automatize_Backery.ViewModels.ReportsVM
 
         private void LoadReports()
         {
-            var reports = _context.Reports
+            var currentUser = vmMain?.CurrentUser;
+
+            var reportsQuery = _context.Reports
                 .Include(r => r.ExpencesReportsParishes)
                     .ThenInclude(erp => erp.Parishe)
                         .ThenInclude(p => p.Sale)
@@ -73,18 +77,44 @@ namespace App_Automatize_Backery.ViewModels.ReportsVM
                                 .ThenInclude(sp => sp.Product)
                 .Include(r => r.ExpencesReportsParishes)
                     .ThenInclude(erp => erp.Expence)
-                        .ThenInclude(s => s.SupplyRequest)
-                            .ThenInclude(srrm => srrm.SupplyRequestsRawMaterials)
+                        .ThenInclude(e => e.SupplyRequest)
+                            .ThenInclude(sr => sr.SupplyRequestsRawMaterials)
                                 .ThenInclude(srrm => srrm.RawMaterial)
                 .Include(r => r.ExpencesReportsParishes)
                     .ThenInclude(erp => erp.Expence)
-                        .ThenInclude(s => s.SupplyRequest)
-                            .ThenInclude(srrm => srrm.SupplyRequestsRawMaterials)
-                                .ThenInclude(srrm => srrm.Warehouse)
-                .ToList();
+                        .ThenInclude(e => e.SupplyRequest)
+                            .ThenInclude(sr => sr.SupplyRequestsRawMaterials)
+                                .ThenInclude(srrm => srrm.Warehouse);
+
+            List<Report> reports;
+
+            if (currentUser?.UserRoleId == 3) // Сотрудник на производстве
+            {
+                reports = reportsQuery
+                    .Where(r =>
+                        r.UserId == currentUser.UserId && // он автор отчета
+                        r.ExpencesReportsParishes.Any(erp =>
+                            erp.Parishe != null && // отчет касается продажи
+                            erp.Parishe.Sale != null &&
+                            erp.Parishe.Sale.UserId == currentUser.UserId)) // он совершал продажу
+                    .ToList();
+            }
+            else if (currentUser?.UserRoleId == 2) // Зав. производством
+            {
+                reports = reportsQuery.ToList(); // без ограничений
+            }
+            else
+            {
+                reports = new List<Report>(); // по умолчанию пусто
+            }
 
             Reports = new ObservableCollection<Report>(reports);
             OnPropertyChanged(nameof(Reports));
+
+            if (Reports.Count == 0)
+            {
+                MessageBox.Show("У вас пока нет доступных отчетов.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -96,7 +126,7 @@ namespace App_Automatize_Backery.ViewModels.ReportsVM
 
         public void GenerateWordReport(Report report)
         {
-            if (report == null || !report.ExpencesReportsParishes.Any())
+            if (report == null)
                 return;
 
             string reportsDirectory = @"D:\ДИПЛОМ\ARM_Proj\Backery_Automatize\App_Automatize_Backery\reports";
@@ -105,10 +135,60 @@ namespace App_Automatize_Backery.ViewModels.ReportsVM
 
             string filePath = Path.Combine(reportsDirectory, $"Report_{report.ReportId}.docx");
 
+            // Обработка РПП за период
+            if (report.ReportType.StartsWith("РПП за период"))
+            {
+                var dateMatch = Regex.Match(report.ReportType, @"с (\d{2}\.\d{2}\.\d{4}) по (\d{2}\.\d{2}\.\d{4})");
+                if (dateMatch.Success)
+                {
+                    var from = DateTime.ParseExact(dateMatch.Groups[1].Value, "dd.MM.yyyy", null);
+                    var to = DateTime.ParseExact(dateMatch.Groups[2].Value, "dd.MM.yyyy", null);
+                    string fileName = $"RPP_Report_{from:yyyyMMdd}_{to:yyyyMMdd}.docx";
+                    string rppFilePath = Path.Combine(reportsDirectory, fileName);
+
+                    if (File.Exists(rppFilePath))
+                    {
+                        Process.Start("explorer.exe", rppFilePath);
+                        return;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Файл отчёта не найден. Сформируйте его заново.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
+            }
+
+            // Обработка инвентаризации
+            if (report.ReportType.StartsWith("Инвентаризация"))
+            {
+                if (File.Exists(filePath))
+                {
+                    Process.Start("explorer.exe", filePath);
+                }
+                else
+                {
+                    MessageBox.Show("Файл отчета по инвентаризации не найден. Возможно, он не был создан или был удален.",
+                                    "Файл не найден", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                return;
+            }
+
+            // Обработка обычных отчетов (с данными расходов и приходов)
+            if (!report.ExpencesReportsParishes.Any())
+            {
+                MessageBox.Show("Отчет не содержит данных для отображения.", "Пустой отчет", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Проверка наличия файла
             if (File.Exists(filePath))
             {
                 Process.Start("explorer.exe", filePath);
-                return;
+            }
+            else
+            {
+                MessageBox.Show("Файл отчета не найден. Сформируйте его заново.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
@@ -402,6 +482,5 @@ namespace App_Automatize_Backery.ViewModels.ReportsVM
 
             return table;
         }
-
     }
 }

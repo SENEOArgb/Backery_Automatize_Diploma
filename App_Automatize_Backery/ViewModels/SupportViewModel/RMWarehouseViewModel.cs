@@ -1,6 +1,7 @@
 ﻿using App_Automatize_Backery.Helper;
 using App_Automatize_Backery.Models;
 using App_Automatize_Backery.View.SupportControls;
+using App_Automatize_Backery.View.UserControls_Pages_.General_WorkerPages;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,10 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel
 {
     internal class RMWarehouseViewModel : INotifyPropertyChanged
     {
+        private MainViewModel _mainViewModel;
         private ObservableCollection<RawMaterialsWarehousesProduct> _warehouseItems;
+
+        public bool IsInventoryButtonVisible => _mainViewModel.CurrentUser?.UserRoleId == 2;
         public ObservableCollection<RawMaterialsWarehousesProduct> WarehouseItems
         {
             get => _warehouseItems;
@@ -30,13 +34,32 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel
         private readonly MinBakeryDbContext _context;
         private Timer _cleanupTimer;
 
-        public RMWarehouseViewModel()
+        public RMWarehouseViewModel(MainViewModel mainViewModel)
         {
+            _mainViewModel = mainViewModel;
             _context = App.DbContext;
             LoadRawMaterials();
             RefreshCommand = new RelayCommand(async (param) => await RefreshWarehousesRM());
+            StartInventoryCommand = new RelayCommand(ExecuteStartInventory);
             //RefreshWarehousesRM();
             StartCleanupTask();  // Инициализируем задачу очистки
+        }
+
+        private void ExecuteStartInventory(object parameter)
+        {
+            var result = MessageBox.Show("Вы уверены, что хотите провести инвентаризацию?", "Подтверждение", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                OpenInventoryWindow();
+            }
+        }
+
+        public ICommand StartInventoryCommand { get; }
+
+        private void OpenInventoryWindow()
+        {
+            var inventoryWindow = new InverntoryWindow(_mainViewModel);
+            inventoryWindow.ShowDialog();  // Открываем окно инвентаризации
         }
 
         private void LoadRawMaterials()
@@ -70,8 +93,6 @@ namespace App_Automatize_Backery.ViewModels.SupportViewModel
                 });
             }
         }
-
-
 
         private void StartCleanupTask()
         {

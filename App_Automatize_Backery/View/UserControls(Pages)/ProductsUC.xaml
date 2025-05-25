@@ -75,12 +75,6 @@
                                                     CommandParameter="{Binding}">
                                                 <materialDesign:PackIcon Kind="Pencil" Width="20" Height="20"/>
                                             </Button>
-                                            <Button Style="{StaticResource MaterialDesignToolButton}"
-                                                    ToolTip="Удалить" Margin="50 0 0 0"
-                                                    Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                    CommandParameter="{Binding}">
-                                                <materialDesign:PackIcon Kind="Delete" Width="20" Height="20"/>
-                                            </Button>
                                             <Button Visibility="{Binding DataContext.IsArchiveVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}"
                                                 Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" Margin="20 0 0 0" Style="{StaticResource MaterialDesignToolForegroundButton}">

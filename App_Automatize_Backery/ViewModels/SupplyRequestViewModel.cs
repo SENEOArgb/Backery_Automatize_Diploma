@@ -149,6 +149,16 @@ namespace App_Automatize_Backery.ViewModels
         {
             if (obj is SupplyRequest requestToDelete)
             {
+                if (requestToDelete.StatusId == 2)
+                {
+                    MessageBox.Show(
+                        $"Заявка от {requestToDelete.SupplyRequestDate:d} уже принята и не может быть отменена.",
+                        "Отмена невозможна",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return; // Прерываем выполнение, не даём удалить
+                }
+
                 var result = MessageBox.Show(
                     $"Вы действительно хотите удалить заявку от {requestToDelete.SupplyRequestDate:d}?",
                     "Подтверждение удаления",
@@ -221,6 +231,7 @@ namespace App_Automatize_Backery.ViewModels
         private async Task AcceptSupplyRequest(SupplyRequest request)
         {
             var materials = await App.DbContext.SupplyRequestsRawMaterials
+                .Include(m => m.RawMaterial)
                 .Where(m => m.SupplyRequestId == request.SupplyRequestId)
                 .ToListAsync();  // Получаем все материалы заявки
 
@@ -252,6 +263,7 @@ namespace App_Automatize_Backery.ViewModels
                         WarehouseId = material.WarehouseId,
                         RawMaterialId = material.RawMaterialId,
                         RawMaterialCount = material.CountRawMaterial,
+                        MeasurementUnitId = material.RawMaterial.MeasurementUnitId,
                         DateSupplyOrProduction = request.SupplyRequestDate  // Указываем дату поставки для новой партии
                     });
                 }

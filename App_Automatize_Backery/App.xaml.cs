@@ -9,6 +9,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 
 namespace App_Automatize_Backery
 {
@@ -29,10 +32,10 @@ namespace App_Automatize_Backery
         {
             base.OnStartup(e);
 
+            await QuartzScheduler.StartAsync();
+
             var stockService = new StockService(App.DbContext);
             var productionViewModel = new ProductionViewModel(App.DbContext, stockService);
-
-            //_ = productionViewModel.MonitorProductionsAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -40,6 +43,7 @@ namespace App_Automatize_Backery
             DbContext.Dispose();
             base.OnExit(e);
         }
+
     }
 
 }

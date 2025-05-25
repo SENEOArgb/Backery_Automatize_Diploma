@@ -27,25 +27,26 @@
                     <TextBlock Text="{Binding DailyNorm}" FontSize="16" FontWeight="Bold" Grid.Column="1" VerticalAlignment="Center" Margin="0 50 0 0"/>
                 </Grid>
 
-                <Button Content="Задать норму" Command="{Binding SetDailyNormCommand}" Margin="0 50 0 0" Background="MidnightBlue" Width="140" 
+                <Button Content="Задать норму" Command="{Binding SetDailyNormCommand}" Margin="0 0 0 0" Background="MidnightBlue" Width="140" 
                         Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="White" Visibility="{Binding ManagerMenuVisibility}"/>
-                <Separator Margin="0 50 0 0"/>
+                <Button Content="Создать отчет РПП" Command="{Binding CreateReportRPP}" Margin="0 10 0 0" Background="Green" Width="200"
+                        Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="White" Visibility="{Binding ManagerMenuVisibility}"/>
+                <Separator Margin="0 20 0 0"/>
 
-                <TextBlock Text="Рабочий день: 8:00 - 21:00" Margin="0 30 0 0" FontSize="18"/>
-                
-                <TextBlock Text="Произведено изделий:" Margin="0 50 0 0" FontSize="18"/>
-                <TextBlock Text="{Binding DailyProduction}" FontSize="16" FontWeight="Bold"/>
+                <TextBlock Text="Рабочий день: 8:00 - 21:00" Margin="0 40 0 0" FontSize="18"/>
 
-                <TextBlock Text="Продано изделий:" Margin="0 50 0 0" FontSize="18"/>
-                <TextBlock Text="{Binding DailySale}" FontSize="16" FontWeight="Bold"/>
+                <TextBlock Text="Произведено изделий:" Margin="0 40 0 0" FontSize="18"/>
+                <TextBlock Text="{Binding DailyProduction}" Margin="195 -20 0 0" FontSize="16" FontWeight="Bold"/>
+
+                <TextBlock Text="Продано изделий:" Margin="0 40 0 0" FontSize="18"/>
+                <TextBlock Text="{Binding DailySale}" Margin="160 -20 0 0" FontSize="16" FontWeight="Bold"/>
 
                 <TextBlock Text="Выполнение нормы:" Margin="0 40 0 0" FontSize="18"/>
-                <TextBlock Text="{Binding DailyCompletionText}" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
-                <ProgressBar Value="{Binding DailyCompletion}" Maximum="100" Height="10"
+                <TextBlock Text="{Binding DailyCompletionText}" Margin="160 -20 0 0" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
+                <ProgressBar Value="{Binding DailyCompletion}" Margin="0 50 0 0" Maximum="100" Height="10"
                          Foreground="MediumSpringGreen" Background="Green" />
             </StackPanel>
         </materialDesign:Card>
-
         <!-- Правая карточка -->
         <materialDesign:Card Grid.Column="1" Padding="20" Margin="10" Background="{DynamicResource MaterialDesignPaper}" BorderThickness="2" BorderBrush="DarkGray">
             <StackPanel HorizontalAlignment="Center">

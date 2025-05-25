@@ -35,7 +35,6 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
         private CancellationTokenSource _cancellationTokenSource;
         private MainViewModel vmMain;
         internal ProductionCreateViewModel vmProdCreate;
-        public Action<bool>? CloseAction { get; set; }
 
         private readonly Action _closeAction;
 
@@ -92,7 +91,6 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             set
             {
                 _selectedOrderDate = value ;
-                //UpdateDateTimeSale();
                 OnPropertyChanged(nameof(SelectedOrderDate));
             }
         }
@@ -103,7 +101,6 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
             set
             {
                 _selectedOrderTime = value;
-                //UpdateDateTimeSale();
                 OnPropertyChanged(nameof(SelectedOrderTime));
             }
         }
@@ -676,38 +673,11 @@ namespace App_Automatize_Backery.ViewModels.SalesVM
                     MessageBox.Show("Дата и время заказа не могут быть в прошлом.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
-
-                // 🔒 Проверка: дата не позже, чем через 7 дней
-                if (SelectedOrderDate.Value.Date > DateTime.Today.AddDays(7))
-                {
-                    MessageBox.Show("Дата заказа не может быть позже, чем через 7 дней от сегодняшней.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                // 🔒 Проверка: дата не раньше сегодняшнего дня
-                if (SelectedOrderDate.Value.Date < DateTime.Today)
-                {
-                    MessageBox.Show("Дата заказа не может быть раньше сегодняшней.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
             }
 
             if (TotalCost <= 0)
             {
                 MessageBox.Show("Общая стоимость продажи должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-
-            var time = Sale.DateTimeSale.TimeOfDay;
-            if (time < new TimeSpan(8, 0, 0) || time > new TimeSpan(21, 0, 0))
-            {
-                MessageBox.Show("Продажи возможны только с 08:00 до 21:00.", "Недопустимое время", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (Sale.DateTimeSale.Date < DateTime.Today || Sale.DateTimeSale.Date > DateTime.Today.AddDays(7))
-            {
-                MessageBox.Show("Дата продажи должна быть от сегодня и не позже, чем через 7 дней.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
 
